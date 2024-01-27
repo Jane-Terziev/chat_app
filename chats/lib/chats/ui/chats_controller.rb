@@ -41,7 +41,7 @@ module Chats
         ]
       end
 
-      def acknowledge_message
+      def acknowledge
         chat_service.acknowledge_messages(params[:chat_id])
         render turbo_stream: turbo_stream.remove("#{params[:chat_id]}UnreadMessageCounter")
       end

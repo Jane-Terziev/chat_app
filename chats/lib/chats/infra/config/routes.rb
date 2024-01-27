@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   resources :chats, controller: "chats/ui/chats" do
-    get 'acknowledge', to: "chats/ui/chats#acknowledge_message", as: 'acknowledge'
+    get 'acknowledge', to: "chats/ui/chats#acknowledge", as: 'acknowledge'
 
     resources :messages, controller: "chats/ui/messages"
     resources :participants, controller: "chats/ui/participants"
