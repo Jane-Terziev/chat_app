@@ -23,7 +23,7 @@ module Chats
           turbo_stream.prepend('chats', partial: 'chat_list_item', locals: { chat: chat, move_to_top: false }),
           turbo_stream.replace('new_chat', partial: 'form', locals: { form: CreateChatValidator.new }),
           turbo_stream.replace('newChatDialog', partial: 'new_dialog')
-        ]
+        ], status: 201
       rescue ConstraintError => e
         render partial: 'form', locals: { form: e.validator }, status: 422
       end

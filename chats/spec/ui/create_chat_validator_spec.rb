@@ -5,6 +5,7 @@ RSpec.describe Chats::Ui::CreateChatValidator, type: :unit do
     let(:params) do
       { 
         name: 'string',
+        user_ids: [SecureRandom.uuid]
       }
     end
 
