@@ -1,7 +1,7 @@
 <nav id="<%= id %>" class="left drawer" data-controller="sidebar" data-turbo-permanent>
   <header style="width: 100%">
     <nav>
-      <h6 class="max small-margin" style="text-wrap: nowrap">App Name</h6>
+      <h6 class="max small-margin" style="text-wrap: nowrap">Chat App</h6>
       <% if dialog %>
         <button class="transparent circle large" data-ui="#dialog-navigation-drawer">
           <i>close</i>
@@ -14,4 +14,8 @@
     </nav>
   </header>
   <div class="small-divider"></div>
+  <%= link_to chats_path do %>
+    <i>chat</i>
+    Messages
+  <% end %>
 </nav>

@@ -1,0 +1,32 @@
+<dialog id="imagePreviewDialog" class="max" data-controller="image-preview">
+  <nav class="right-align">
+    <i class="small-margin" data-action="click->image-preview#close" style="cursor: pointer">close</i>
+  </nav>
+  <img id="imagePreviewContent" style="width: 100%; height: auto">
+</dialog>
+
+<%= render 'new_dialog' %>
+
+<div class="grid" style="min-height: 85vh">
+  <div class="s12 m12 l4 border round large-padding">
+    <div class="row" style="margin-bottom: 2rem;">
+      <h6 class="max">Chats</h6>
+      <button class="circle responsive" onclick="document.getElementById('newChatDialog').show()">
+        <i>add</i>
+        <span>Add Chat</span>
+      </button>
+    </div>
+
+    <div style="margin-bottom: 1rem;"></div>
+
+    <%= render 'table_filter' %>
+
+    <%= turbo_stream_from ['chats_list', current_user.id] %>
+    <%= render 'chats_list', chats: @chats %>
+  </div>
+
+  <div class="s12 m12 l8 border round large-padding">
+    <%= turbo_frame_tag 'chat_messages' do %>
+    <% end %>
+  </div>
+</div>

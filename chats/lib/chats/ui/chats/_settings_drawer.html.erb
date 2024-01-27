@@ -1,0 +1,76 @@
+<dialog class="right" id="chatSettingsDrawer" style="max-width: 20%">
+  <header>
+    <nav style="gap: 0.25rem">
+      <button class="transparent circle large" data-action="click->drawer#toggle">
+        <i>close</i>
+      </button>
+      <h6 class="max no-margin cut-text"><%= chat.name %></h6>
+    </nav>
+  </header>
+  <div class="large-divider"></div>
+  <details class="small-margin">
+    <summary class="none">
+      <article class="round no-elevate">
+        <nav>
+          <div class="max">Chat Members</div>
+          <i>chevron_right</i>
+        </nav>
+      </article>
+    </summary>
+
+    <%= render 'chats/ui/participants/chat_participant_list', chat: chat %>
+
+    <div class="row wave round medium-padding" onclick="document.getElementById('addChatParticipantDialog').show()">
+      <i>person_add</i>
+      Add People
+    </div>
+  </details>
+
+  <details class="small-margin">
+    <summary class="none">
+      <article class="round no-elevate">
+        <nav>
+          <div class="max">Media</div>
+          <i>chevron_right</i>
+        </nav>
+      </article>
+    </summary>
+
+    <div class="row round small-padding no-margin">
+      <div class="max">
+        <a>
+          <i class="small-padding">image</i>
+          Images
+        </a>
+      </div>
+    </div>
+  </details>
+
+  <details class="small-margin">
+    <summary class="none">
+      <article class="round no-elevate">
+        <nav>
+          <div class="max">Settings</div>
+          <i>chevron_right</i>
+        </nav>
+      </article>
+    </summary>
+
+    <div class="row round small-padding no-margin">
+      <div>
+        <%= link_to chat_path(id: chat.id), data: { "turbo-method": :delete, "turbo-frame": '_top' } do %>
+          <i class="small-margin">delete</i>
+          Delete Chat
+        <% end %>
+      </div>
+    </div>
+    <div class="row round small-padding no-margin">
+      <div>
+        <%= link_to chat_leave_chat_path(chat_id: chat.id), data: { "turbo-method": :delete } do %>
+          <i class="small-margin">logout</i>
+          Leave Chat
+        <% end %>
+      </div>
+    </div>
+  </details>
+</dialog>

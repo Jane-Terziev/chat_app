@@ -1,0 +1,26 @@
+<%= turbo_frame_tag 'chat_messages' do %>
+  <div id="chatMessageContainer">
+    <div data-controller="drawer" data-drawer-element-id-value="chatSettingsDrawer">
+      <%= render 'chats/ui/chats/settings_drawer', chat: chat %>
+      <%= render 'chats/ui/participants/chat_add_chat_participants_dialog', chat: chat %>
+      <div class="row" id="<%= chat.id %>">
+        <div class="max">
+          <h6 class="cut-text"><%= chat.name %></h6>
+          <p class="max tooltip no-space top">
+            <%= chat.name %>
+          </p>
+        </div>
+        <i style="cursor:pointer;" data-action="click->drawer#toggle">more_horiz</i>
+      </div>
+      <div class="large-divider"></div>
+    </div>
+
+    <%= turbo_stream_from [chat.id, current_user.id] %>
+
+    <%= render 'messages_list', chat: chat, user_id: current_user.id %>
+
+    <div style="margin-top: 2rem;">
+      <%= render 'message_form', chat_id: chat.id, form: Chats::Ui::SendMessageValidator.new  %>
+    </div>
+  </div>
+<% end %>

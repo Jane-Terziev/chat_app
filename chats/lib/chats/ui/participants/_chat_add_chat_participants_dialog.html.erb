@@ -1,0 +1,13 @@
+<dialog id="addChatParticipantDialog" class="modal surface">
+  <header>
+    <nav style="gap: 0.25rem">
+      <h6 class="max no-margin cut-text">Add People to Chat</h6>
+      <button class="transparent circle large" onclick="document.getElementById('addChatParticipantDialog').close()">
+        <i>close</i>
+      </button>
+    </nav>
+  </header>
+  <div class="large-divider"></div>
+
+  <%= render 'chats/ui/participants/add_chat_participant_form', form: Chats::Ui::AddChatParticipantValidator.new, chat_id: chat.id %>
+</dialog>

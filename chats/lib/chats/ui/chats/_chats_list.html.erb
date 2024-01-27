@@ -1,0 +1,5 @@
+<div id="chats">
+  <% chats.each do |chat|  %>
+    <%= render 'chat_list_item', chat: chat, move_to_top: false %>
+  <% end %>
+</div>
