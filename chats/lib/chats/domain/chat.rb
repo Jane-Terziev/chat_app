@@ -88,9 +88,13 @@ module Chats
       end
 
       def remove_message(message_id:, user_id:)
-        chat_participants.find do |it|
+        message = chat_participants.find do |it|
           it.user_id == user_id
-        end.messages.find { |it| it.id == message_id }&.mark_for_destruction
+        end.messages.find { |it| it.id == message_id }
+
+        raise ActiveRecord::RecordNotFound unless message.present?
+
+        message.mark_for_destruction
 
         apply_event(
           MessageRemovedEvent.new(

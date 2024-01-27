@@ -13,7 +13,6 @@ RSpec.describe Chats::Ui::ChatsController, type: :controller do
   end
 
   describe 'GET #index' do
-
     subject { get :index }
     render_views
 
