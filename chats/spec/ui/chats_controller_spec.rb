@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Chats::Ui::ChatsController, type: :controller do
-  let(:chat_service) { instance_double(Chats::App::ChatService) }
   let!(:chats) { [Chats::Domain::Chat.create!(id: SecureRandom.uuid, name: 'string')] }
   let(:current_user) do
     User.create!(
