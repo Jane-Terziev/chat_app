@@ -1,0 +1,200 @@
+body.dark {
+  --primary:#abc7ff;
+  --on-primary:#002f65;
+  --primary-container:#03458e;
+  --on-primary-container:#d7e3ff;
+  --secondary:#bec6dc;
+  --on-secondary:#283041;
+  --secondary-container:#3e4759;
+  --on-secondary-container:#dae2f9;
+  --tertiary:#ddbce0;
+  --on-tertiary:#3f2844;
+  --tertiary-container:#573e5c;
+  --on-tertiary-container:#fad8fd;
+  --error:#ffb4ab;
+  --on-error:#690005;
+  --error-container:#93000a;
+  --on-error-container:#ffb4ab;
+  --background:#1a1b1f;
+  --on-background:#e3e2e6;
+  --surface:#121316;
+  --on-surface:#e3e2e6;
+  --surface-variant:#44474e;
+  --on-surface-variant:#c4c6d0;
+  --outline:#8e9099;
+  --outline-variant:#44474e;
+  --shadow:#000000;
+  --scrim:#000000;
+  --inverse-surface:#e3e2e6;
+  --inverse-on-surface:#2f3033;
+  --inverse-primary:#2c5ea7;
+  --surface-dim:#121316;
+  --surface-bright:#38393c;
+  --surface-container-lowest:#0d0e11;
+  --surface-container-low:#1a1b1f;
+  --surface-container:#1f1f23;
+  --surface-container-high:#292a2d;
+  --surface-container-highest:#343538;
+}
+
+body.light {
+  --primary:#0061a4;
+  --on-primary:#ffffff;
+  --primary-container:#d1e4ff;
+  --on-primary-container:#001d36;
+  --secondary:#535f70;
+  --on-secondary:#ffffff;
+  --secondary-container:#d7e3f7;
+  --on-secondary-container:#101c2b;
+  --tertiary:#6b5778;
+  --on-tertiary:#ffffff;
+  --tertiary-container:#f2daff;
+  --on-tertiary-container:#251431;
+  --error:#ba1a1a;
+  --on-error:#ffffff;
+  --error-container:#ffdad6;
+  --on-error-container:#410002;
+  --background:#fdfcff;
+  --on-background:#1a1c1e;
+  --surface:#faf9fc;
+  --on-surface:#1a1c1e;
+  --surface-variant:#dfe2eb;
+  --on-surface-variant:#43474e;
+  --outline:#73777f;
+  --outline-variant:#c3c7cf;
+  --shadow:#000000;
+  --scrim:#000000;
+  --inverse-surface:#2f3033;
+  --inverse-on-surface:#f1f0f4;
+  --inverse-primary:#9ecaff;
+  --surface-dim:#dadadd;
+  --surface-bright:#faf9fc;
+  --surface-container-lowest:#ffffff;
+  --surface-container-low:#f4f3f7;
+  --surface-container:#eeedf1;
+  --surface-container-high:#e8e8eb;
+  --surface-container-highest:#e2e2e6;
+}
+
+@media(max-width: 575.98px) {
+  #bottom-navigation {
+    display: flex;
+  }
+
+  #hamburgerMenu {
+    display: inline-flex;
+  }
+
+  #sidebar {
+    display: none;
+  }
+
+  nav.left:not(.s,.m,.l)~.responsive {
+    padding-left: 0;
+  }
+}
+
+@media(max-width: 640px) {
+  .page-number {
+    display: none;
+  }
+}
+
+@media(min-width: 575.98px) {
+  #bottom-navigation {
+    display: none;
+  }
+
+  #hamburgerMenu {
+    display: none;
+  }
+
+  #sidebar {
+    display: flex;
+  }
+
+  main {
+    padding: 0.25rem;
+  }
+}
+
+:is(th,td) {
+  max-inline-size: none;
+}
+
+p {
+  word-break: break-all;
+}
+
+body.light #sidebar, body.light #bottom-navigation, body.light #drawer-sidebar {
+  background-color: #37517e !important;
+  color: white !important;
+}
+
+body.light nav.drawer>a:is(:hover,.active),
+body.light nav.drawer>:is(ol,ul)>li>a:is(:hover,.active) {
+  background-color: white;
+  color: #37517e;
+}
+
+nav.drawer>a:is(:hover,.active),
+nav.drawer>:is(ol,ul)>li>a:is(:hover,.active) {
+  transition: all var(--speed3) ease;
+}
+
+body.light nav:is(.left,.right,.top,.bottom):not(.drawer)>a:not(.button,.chip):is(:hover,:focus,.active)>i,
+body.light nav:is(.left,.right,.top,.bottom):not(.drawer)>:is(ol,ul)>li>a:not(.button,.chip):is(:hover,:focus,.active)>i {
+  background-color: white;
+  color: #37517e;
+}
+
+nav:is(.left,.right,.top,.bottom) {
+  transition: width var(--speed3);
+}
+
+main {
+  transition: padding var(--speed3);
+}
+
+
+.success {
+  background-color: green !important;
+  color: white !important;
+  font-weight: bolder;
+}
+
+.error {
+  font-weight: bolder;
+}
+
+.table-responsive {
+  display: block !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  white-space: nowrap !important;
+}
+
+.pill {
+  border-radius: 50px;
+  padding: 5px 15px;
+  display: inline-block;
+}
+
+.green-pill {
+  background-color: green;
+  color: white;
+}
+
+.orange-pill {
+  background-color: orange;
+  color: white;
+}
+
+.red-pill {
+  background-color: red;
+  color: white;
+}
+
+td:nth-last-child(-n+2) {
+  width: 15% !important;
+}

@@ -1,0 +1,12 @@
+<%
+  key = flash&.keys&.first&.to_s || ""
+  value = flash[key] || []
+  value = [value] unless value.is_a?(Array)
+%>
+
+<div id="flash"
+     data-controller="flash"
+     data-flash-type-value="<%= key %>"
+     data-flash-message-value="<%= value %>"
+>
+</div>

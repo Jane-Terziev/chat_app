@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat App</title>
+  <meta name="turbo-cache-control" content="no-cache">
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+
+  <link href="https://cdn.jsdelivr.net/npm/beercss@3.4.13/dist/cdn/beer.min.css" rel="stylesheet" data-turbo-track="reload">
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <link href="https://unpkg.com/slim-select@latest/dist/slimselect.css" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+
+
+<body data-controller='theme'>
+<% if current_user %>
+  <%= turbo_stream_from current_user.id %>
+
+  <%= tag.div id: 'time-zone', data: { time_zone: current_user.time_zone } %>
+  <%= render 'shared/sidebar', dialog: false, id: 'sidebar' %>
+  <%= render 'shared/navigation_drawer' %>
+  <%= render 'shared/bottom_navigation' %>
+  <%= render 'shared/flash' %>
+  <main class='responsive max'>
+    <%= render 'shared/navbar' %>
+    <div class="medium-margin">
+      <%= yield %>
+    </div>
+  </main>
+<% else %>
+  <%= yield %>
+<% end %>
+</body>
+</html>

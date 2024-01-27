@@ -1,0 +1,30 @@
+<% link = pagy_link_proc(@paginated_result.pagination) %>
+<nav class="wrap small-padding right-align">
+  <% if @paginated_result.pagination.prev %>
+    <%== link.call(@paginated_result.pagination.prev, "Previous", 'aria-label="previous" class="button"') %>
+  <% else %>
+    <button disabled>
+      Previous
+    </button>
+  <% end %>
+
+  <% @paginated_result.pagination.series.each do |item| %>
+    <% if item.is_a?(Integer) %>
+      <%== link.call(item, item, 'class="button circle page-number"') %>
+    <% elsif item.is_a?(String) %>
+      <%== link.call(item, item, 'class="button circle" disabled') %>
+    <% elsif item == :gap %>
+      <a href="#" class="page-number">
+        <%== pagy_t('@paginated_result.pagination.nav.gap') %>
+      </a>
+    <% end %>
+  <% end %>
+
+  <% if @paginated_result.pagination.next %>
+    <%== link.call(@paginated_result.pagination.next, "Next", 'aria-label="next" class="button"') %>
+  <% else %>
+    <button disabled>
+      Next
+    </button>
+  <% end %>
+</nav>

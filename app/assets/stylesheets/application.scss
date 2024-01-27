@@ -1,0 +1,23 @@
+@import 'generator';
+@import 'slim_select';
+
+.messageRow .messageOptions {
+  visibility: hidden;
+}
+
+.messageRow:hover .messageOptions {
+  visibility: initial;
+}
+
+.cut-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tooltip.max {
+  font-size: x-small;
+  inline-size: initial;
+  padding: 0.5rem;
+}

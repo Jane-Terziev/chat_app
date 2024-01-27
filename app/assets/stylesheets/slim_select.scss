@@ -1,0 +1,33 @@
+.ss-main {
+  border: 1px solid var(--outline) !important;
+  padding: 0.75rem !important;
+  border-radius: 1.5rem !important;
+}
+
+.ss-main, .ss-content, .ss-search input, .ss-placeholder, .ss-option {
+  background: var(--surface) !important;
+  color: var(--on-surface) !important;
+}
+
+.ss-content, .ss-search input {
+  border: 1px solid var(--outline) !important;
+  border-radius: 0.75rem !important;
+}
+
+.ss-content {
+  margin-top: 0.25rem !important;
+}
+
+.ss-value {
+  background-color: var(--outline) !important;
+  border-radius: 3rem !important;
+  padding: 0.25rem !important;
+}
+
+.ss-value-text {
+  font-size: medium !important;
+}
+
+.ss-value-delete {
+  border-radius: 0 !important;
+}
