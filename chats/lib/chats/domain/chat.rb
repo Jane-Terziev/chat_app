@@ -126,7 +126,12 @@ module Chats
       end
 
       def remove_chat_participant(user_id:)
-        chat_participants.find {|it| it.user_id == user_id }&.mark_for_destruction
+        participant = chat_participants.find {|it| it.user_id == user_id }
+
+        raise ActiveRecord::RecordNotFound unless participant.present?
+
+        participant.mark_for_destruction
+
         apply_event(
           ChatParticipantRemovedEvent.new(
             data: {

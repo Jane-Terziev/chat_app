@@ -18,7 +18,7 @@ module Chats
             locals: { form: AddChatParticipantValidator.new, chat_id: params[:chat_id] }
           ),
           turbo_stream.replace('addChatParticipantDialog', partial: 'chat_add_chat_participants_dialog', locals: { chat: chat_participant_dto })
-        ]
+        ], status: 201
       rescue ConstraintError => e
         render partial: 'add_chat_participant_form', locals: { form: e.validator, chat_id: params[:chat_id] }, status: 422
       end
