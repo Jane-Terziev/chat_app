@@ -6,7 +6,6 @@ module Chats
       def index
         @chats = chat_service.get_all_chats(
           ListQuery.new(
-            current_user_id: current_user.id,
             page: params[:page] || 1,
             page_size: params[:page_size] || 10,
             q: params[:q] || {}

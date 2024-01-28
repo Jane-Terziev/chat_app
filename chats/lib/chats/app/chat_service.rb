@@ -99,7 +99,7 @@ module Chats
 
       def get_all_chats(query)
         chats = chat_repository.joins(:chat_participants)
-                       .where(chat_participants: { user_id: query.current_user_id })
+                       .where(chat_participants: { user_id: current_user_repository.authenticated_identity.id })
                        .includes(:unacknowledged_messages)
                        .order('updated_at DESC')
                        .ransack(query.q)
