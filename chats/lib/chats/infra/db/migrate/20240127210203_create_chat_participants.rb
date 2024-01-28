@@ -2,8 +2,6 @@ class CreateChatParticipants < ActiveRecord::Migration[7.1]
   def change
     create_table :chat_participants, id: false do |t|
       t.string :id, primary_key: true, limit: 36
-      t.string :first_name
-      t.string :last_name
 
       t.string :user_id
       t.string :chat_id

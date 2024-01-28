@@ -43,8 +43,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_27_211151) do
   end
 
   create_table "chat_participants", id: { type: :string, limit: 36 }, force: :cascade do |t|
-    t.string "first_name"
-    t.string "last_name"
     t.string "user_id"
     t.string "chat_id"
     t.datetime "created_at", null: false

@@ -33,7 +33,9 @@ module Chats
 
       def send_message(command)
         chat = ActiveRecord::Base.transaction do
-          chat = chat_repository.includes(chat_participants: :messages).find(command.chat_id)
+          chat = chat_repository.includes(
+            chat_participants: [:user, messages: [:attachments_attachments, :attachments_blobs] ]
+          ).find(command.chat_id)
           chat.send_message(
             user_id: current_user_repository.authenticated_identity.id,
             message: command.message,
@@ -59,7 +61,7 @@ module Chats
 
       def remove_message(chat_id, message_id)
         chat = ActiveRecord::Base.transaction do
-          chat = chat_repository.includes(chat_participants: { messages: :unacknowledged_messages }).find(chat_id)
+          chat = chat_repository.includes(chat_participants: :messages).find(chat_id)
           chat.remove_message(message_id: message_id, user_id: current_user_repository.authenticated_identity.id)
           chat_repository.save!(chat)
         end
@@ -116,7 +118,7 @@ module Chats
         chat = ActiveRecord::Base.transaction do
           chat = chat_repository.includes(
             :unacknowledged_messages,
-            chat_participants: { messages: [:attachments_attachments, :attachments_blobs] }
+            chat_participants: [:user, messages: [:attachments_attachments, :attachments_blobs] ],
           ).find(id)
           chat.acknowledge_messages(user_id: current_user_repository.authenticated_identity.id)
           chat_repository.save!(chat)
