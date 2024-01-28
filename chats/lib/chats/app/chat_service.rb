@@ -3,6 +3,7 @@ module Chats
     class ChatService < ApplicationService
       include Import[
                 chat_repository: "chats.chat_repository",
+                message_repository: "chats.message_repository",
                 current_user_repository: 'current_user_repository'
               ]
 
@@ -136,7 +137,7 @@ module Chats
         publish_all(chat)
 
         pagy_metadata, paginated_data = pagy_countless(
-          ::Chats::Domain::Message.joins(:chat_participant)
+          message_repository.joins(:chat_participant)
                                   .where(chat_participants: { chat_id: query.chat_id })
                                   .includes(chat_participant: :user, attachments_attachments: :blob)
                                   .order('created_at DESC'),

@@ -2,10 +2,15 @@ require 'rails_helper'
 
 RSpec.describe Chats::App::ChatService, type: :unit do
   subject(:chat_service) do
-    described_class.new(chat_repository: chat_repository, current_user_repository: current_user_repository)
+    described_class.new(
+      chat_repository: chat_repository,
+      current_user_repository: current_user_repository,
+      message_repository: message_repository
+    )
   end
 
   let(:chat_repository) { spy(Chats::Domain::Chat) }
+  let(:message_repository) { spy(Chats::Domain::Message) }
   let(:current_user_repository) { spy(CurrentUserRepository) }
   let(:current_user) { instance_double(User) }
   let(:current_user_id) { SecureRandom.uuid }
@@ -263,7 +268,7 @@ RSpec.describe Chats::App::ChatService, type: :unit do
         chat_service.get_all_chats(query)
         expect(chat_repository).to have_received(:joins).with(:chat_participants)
         expect(chat_repository.joins).to have_received(:where).with(chat_participants: { user_id: current_user_id })
-        expect(chat_repository.joins.where).to have_received(:includes).with(:unacknowledged_messages)
+        expect(chat_repository.joins.where).to have_received(:includes).with(:unacknowledged_messages, { chat_participants: :messages })
         expect(chat_repository.joins.where.includes).to have_received(:order).with('updated_at DESC')
         expect(chat_repository.joins.where.includes.order).to have_received(:ransack).with(query.q)
         expect(chat_repository.joins.where.includes.order.ransack).to have_received(:result)
@@ -278,38 +283,45 @@ RSpec.describe Chats::App::ChatService, type: :unit do
     end
   end
 
-  describe "#.get_chat(id)" do
+  describe "#.get_chat(query)" do
+    let(:query) { Chats::Ui::MessageListQuery.new(chat_id: chat.id) }
+
     context "when the chat with the id is not found" do
       before do
         allow(chat_repository).to receive(:find) { raise ActiveRecord::RecordNotFound }
       end
 
       it 'should raise a ActiveRecord::RecordNotFound error' do
-        expect { chat_service.get_chat(chat.id) }.to raise_error { ActiveRecord::RecordNotFound }
+        expect { chat_service.get_chat(query) }.to raise_error { ActiveRecord::RecordNotFound }
         expect(chat_repository).to have_received(:find).with(chat.id)
       end
     end
 
     context "when the chat is found" do
+      let(:messages)  { [spy(Chats::Domain::Message)] }
+
       before do
         allow(chat_repository).to receive_message_chain(:includes, :find) { chat }
         allow(chat).to receive(:acknowledge_messages)
         allow(chat_repository).to receive(:save!) { chat }
         allow(chat_service).to receive(:publish_all)
-        allow(chat_service).to receive(:map_into)
+        allow(message_repository).to receive_message_chain(:joins, :where, :includes, :order) { messages }
+        allow(chat_service).to receive(:map_into).with(messages[0], Chats::App::MessageDto) { messages[0] }
+        allow(chat_service).to receive(:map_into).with(chat, Chats::App::GetChatDetailsDto, { messages: messages.reverse })
+        allow(chat_service).to receive(:pagy_countless) { [Pagy.new(count: 1000, page: 10, size: 5), messages]  }
       end
 
       it 'should return a chat details dto' do
-        chat_service.get_chat(chat.id)
+        chat_service.get_chat(query)
         expect(chat_repository).to have_received(:includes).with(
           :unacknowledged_messages,
-          chat_participants: [:user, messages: [:attachments_attachments, :attachments_blobs] ]
+          chat_participants: [:user]
         )
         expect(chat_repository.includes).to have_received(:find).with(chat.id)
         expect(chat).to have_received(:acknowledge_messages).with(user_id: current_user_id)
         expect(chat_repository).to have_received(:save!).with(chat)
         expect(chat_service).to have_received(:publish_all).with(chat)
-        expect(chat_service).to have_received(:map_into).with(chat, Chats::App::GetChatDetailsDto)
+        expect(chat_service).to have_received(:map_into).with(chat, Chats::App::GetChatDetailsDto, { messages: messages.reverse })
       end
     end
   end
