@@ -126,19 +126,34 @@ module Chats
         )
       end
 
-      def get_chat(id)
+      def get_chat(query)
         chat = ActiveRecord::Base.transaction do
-          chat = chat_repository.includes(
-            :unacknowledged_messages,
-            chat_participants: [:user, messages: [:attachments_attachments, :attachments_blobs] ],
-          ).find(id)
+          chat = chat_repository.includes(:unacknowledged_messages, chat_participants: [:user]).find(query.chat_id)
           chat.acknowledge_messages(user_id: current_user_repository.authenticated_identity.id)
           chat_repository.save!(chat)
         end
 
         publish_all(chat)
 
-        map_into(chat, GetChatDetailsDto)
+        pagy_metadata, paginated_data = pagy_countless(
+          ::Chats::Domain::Message.joins(:chat_participant)
+                                  .where(chat_participants: { chat_id: query.chat_id })
+                                  .includes(chat_participant: :user, attachments_attachments: :blob)
+                                  .order('created_at DESC'),
+          items: query.page_size,
+          page: query.page
+        )
+
+        message_dtos = paginated_data.map do |message|
+          map_into(message, MessageDto)
+        end
+
+        chat_dto = map_into(chat, GetChatDetailsDto, { messages: message_dtos.reverse })
+
+        PaginatedChatDetailsDto.new(
+          data: chat_dto,
+          pagination: pagy_metadata
+        )
       end
     end
   end

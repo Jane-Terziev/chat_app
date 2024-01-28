@@ -1,0 +1,14 @@
+<%= turbo_stream.prepend 'messageContainer' do %>
+  <% @paginated_result.data.messages.each do |message|  %>
+    <%= render 'message_list_item', message: message, user_id: current_user.id, should_scroll: false, acknowledge: false %>
+  <% end %>
+<% end %>
+
+<%= turbo_stream.replace 'message_pagination' do %>
+  <% if @paginated_result.pagination.next.present? %>
+    <%= turbo_frame_tag 'message_pagination', loading: :lazy, src: chat_messages_load_more_path(
+      format: :turbo_stream,
+      page: @paginated_result.pagination.next
+    ) %>
+  <% end %>
+<% end %>

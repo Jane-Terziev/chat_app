@@ -3,6 +3,7 @@ Rails.application.routes.draw do
     get 'acknowledge', to: "chats/ui/chats#acknowledge", as: 'acknowledge'
 
     resources :messages, controller: "chats/ui/messages"
+    get 'load_more', to: 'chats/ui/messages#load_more', as: 'messages_load_more'
     resources :participants, controller: "chats/ui/participants"
     delete 'leave_chat', to: 'chats/ui/chats#leave_chat', as: 'leave_chat'
   end

@@ -1,6 +1,6 @@
-<div style="height: 450px; overflow-y: scroll; padding-bottom: 1rem">
+<div style="height: 450px; overflow-y: scroll; padding-bottom: 1rem;">
   <div id="chats">
-    <% chats.each_with_index do |chat|  %>
+    <% chats.each do |chat|  %>
       <%= render 'chat_list_item', chat: chat, move_to_top: false %>
     <% end %>
   </div>

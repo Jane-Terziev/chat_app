@@ -4,12 +4,30 @@ module Chats
       include Import.inject[chat_service: 'chats.chat_service']
 
       def index
-        chat = chat_service.get_chat(params[:chat_id])
+        paginated_result = chat_service.get_chat(
+          MessageListQuery.new(
+            chat_id: params[:chat_id],
+            page: params[:page] || 1,
+            page_size: params[:page_size] || 10,
+            q: params[:q] || {}
+          )
+        )
 
         render turbo_stream: [
-          turbo_stream.replace('chat_messages', partial: 'index', locals: { chat: chat }),
+          turbo_stream.replace('chat_messages', partial: 'index', locals: { chat: paginated_result.data }),
           turbo_stream.remove("#{params[:chat_id]}UnreadMessageCounter")
         ]
+      end
+
+      def load_more
+        @paginated_result = chat_service.get_chat(
+          MessageListQuery.new(
+            chat_id: params[:chat_id],
+            page: params[:page] || 1,
+            page_size: params[:page_size] || 10,
+            q: params[:q] || {}
+          )
+        )
       end
 
       def create
