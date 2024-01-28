@@ -1,5 +1,5 @@
 <%
-  key = flash&.keys&.first&.to_s || ""
+  key = flash&.keys&.first || ""
   value = flash[key] || []
   value = [value] unless value.is_a?(Array)
 %>
