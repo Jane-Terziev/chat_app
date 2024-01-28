@@ -10,7 +10,7 @@ module Chats
       private
 
       def broadcast_CreatedEvent(event)
-        chat = chat_repository.includes(:chat_participants, :unacknowledged_messages).find(event.chat_id)
+        chat = chat_repository.find(event.chat_id)
         chat.chat_participants.each do |participant|
           next if participant.user_id == event.current_user_id
 
@@ -31,7 +31,7 @@ module Chats
       end
 
       def broadcast_MessageSentEvent(event)
-        chat = chat_repository.includes(:chat_participants, :unacknowledged_messages).find(event.chat_id)
+        chat = chat_repository.find(event.chat_id)
         chat.chat_participants.each do |participant|
           next if participant.user_id == event.current_user_id
           broadcast_replace_stream(chat, participant, true)
@@ -39,7 +39,7 @@ module Chats
       end
 
       def broadcast_MessageRemovedEvent(event)
-        chat = chat_repository.includes(:chat_participants, :unacknowledged_messages).find(event.chat_id)
+        chat = chat_repository.find(event.chat_id)
         chat.chat_participants.each do |participant|
           next if participant.user_id == event.current_user_id
           broadcast_replace_stream(chat, participant, false)
@@ -54,7 +54,7 @@ module Chats
       end
 
       def broadcast_ChatParticipantAddedEvent(event)
-        chat = chat_repository.includes(:chat_participants, :unacknowledged_messages).find(event.chat_id)
+        chat = chat_repository.find(event.chat_id)
         Turbo::StreamsChannel.broadcast_prepend_to(
           ['chats_list', event.chat_participant_user_id],
           target: 'chats',

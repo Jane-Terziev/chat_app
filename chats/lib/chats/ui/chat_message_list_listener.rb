@@ -1,7 +1,7 @@
 module Chats
   module Ui
     class ChatMessageListListener < AsyncEventHandler
-      include Import.active_job[chat_repository: 'chats.chat_repository']
+      include Import.active_job[chat_repository: 'chats.chat_repository', message_repository: 'chats.message_repository']
 
       def call(event)
         send "broadcast_#{event.class.name.demodulize}", event
@@ -10,7 +10,8 @@ module Chats
       private
 
       def broadcast_MessageSentEvent(event)
-        chat = chat_repository.includes(chat_participants: { messages: :unacknowledged_messages }).find(event.chat_id)
+        chat = chat_repository.find(event.chat_id)
+        message = message_repository.find(event.message_id)
         chat.chat_participants.each do |participant|
           next if participant.user_id == event.current_user_id
 
@@ -19,10 +20,7 @@ module Chats
             target: 'messageContainer',
             partial: 'chats/ui/messages/message_list_item',
             locals: {
-              message: ::DryObjectMapper::Mapper.call(
-                chat.messages.find {|it| it.id == event.message_id },
-                ::Chats::App::MessageDto
-              ),
+              message: ::DryObjectMapper::Mapper.call(message, ::Chats::App::MessageDto),
               user_id: participant.user_id,
               should_scroll: true,
               acknowledge: true
