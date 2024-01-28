@@ -17,7 +17,7 @@ module Chats
           Turbo::StreamsChannel.broadcast_append_to(
             [chat.id, participant.user_id],
             target: 'messageContainer',
-            partial: 'chats/ui/messages/message_item',
+            partial: 'chats/ui/messages/message_list_item',
             locals: {
               message: ::DryObjectMapper::Mapper.call(
                 chat.messages.find {|it| it.id == event.message_id },

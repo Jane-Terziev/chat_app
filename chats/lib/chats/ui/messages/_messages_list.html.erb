@@ -1,5 +1,5 @@
 <div id="messageContainer" style="overflow-y: scroll; height: 450px;" data-controller="chat">
   <% chat.messages.each do |message| %>
-    <%= render 'message_item', message: message, user_id: current_user.id, should_scroll: false, acknowledge: false %>
+    <%= render 'message_list_item', message: message, user_id: current_user.id, should_scroll: false, acknowledge: false %>
   <% end %>
 </div>

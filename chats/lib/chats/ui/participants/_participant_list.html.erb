@@ -1,0 +1,5 @@
+<div id="chatParticipantList">
+  <% chat.chat_participants.each do |participant| %>
+    <%= render 'chats/ui/participants/participant_list_item', chat_id: chat.id, participant: participant %>
+  <% end %>
+</div>

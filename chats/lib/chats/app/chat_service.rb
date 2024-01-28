@@ -92,6 +92,8 @@ module Chats
         end
 
         publish_all(chat)
+
+        map_into(chat, GetChatParticipantDto)
       end
 
 

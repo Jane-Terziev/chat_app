@@ -19,7 +19,7 @@
 
     <div style="margin-bottom: 1rem;"></div>
 
-    <%= render 'table_filter' %>
+    <%= render 'chat_filter' %>
 
     <%= turbo_stream_from ['chats_list', current_user.id] %>
     <%= render 'chats_list', chats: @chats %>

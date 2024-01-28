@@ -29,7 +29,7 @@ module Chats
           )
         ], status: 201
       rescue ConstraintError => e
-        render partial: 'message_form', locals: { form: e.validator, chat_id: params[:chat_id] }, status: 422
+        render partial: 'form', locals: { form: e.validator, chat_id: params[:chat_id] }, status: 422
       end
 
       def destroy

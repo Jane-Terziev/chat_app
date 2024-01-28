@@ -98,7 +98,7 @@ RSpec.describe Chats::Ui::MessagesController, type: :controller do
         it 'should return a form with an error' do
           subject
           expect(response.status).to eq(422)
-          expect(response).to render_template 'chats/ui/messages/_message_form'
+          expect(response).to render_template 'chats/ui/messages/_form'
         end
       end
     end
