@@ -30,7 +30,7 @@
   <% if chat.has_unread_messages? %>
     <span id="<%= chat.id %>UnreadMessageCounter" class="badge circle none"><%= chat.unread_messages %></span>
   <% end %>
-  <p class="max tooltip no-space top small-text" style="position: static;">
+  <p class="max tooltip no-space bottom small-text">
     <%= chat.name %>
   </p>
 <% end %>
