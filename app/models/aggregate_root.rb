@@ -5,10 +5,6 @@ class AggregateRoot < ApplicationRecord
     @domain_events ||= []
   end
 
-  def clear_domain_events
-    domain_events.clear
-  end
-
   def apply_event(event)
     domain_events << event
     self.updated_at = DateTime.now

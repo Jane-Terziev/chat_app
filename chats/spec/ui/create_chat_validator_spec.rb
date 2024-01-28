@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Chats::Ui::CreateChatValidator, type: :unit do
   describe '#.call(params)' do
     let(:params) do
-      { 
+      {
         name: 'string',
         user_ids: [SecureRandom.uuid]
       }
