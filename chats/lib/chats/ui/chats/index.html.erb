@@ -22,7 +22,7 @@
     <%= render 'chat_filter' %>
 
     <%= turbo_stream_from ['chats_list', current_user.id] %>
-    <%= render 'chats_list', chats: @chats %>
+    <%= render 'chats_list', chats: @paginated_result.data %>
   </div>
 
   <div class="s12 m12 l8 border round large-padding">

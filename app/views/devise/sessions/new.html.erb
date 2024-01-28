@@ -1,7 +1,7 @@
 <main class="responsive center-align middle-align">
   <article style="padding: 6rem;">
     <h4 class="max center" style="margin-bottom: 1.5rem;">Log in</h4>
-    <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { "data-controller": 'form' }) do |f| %>
+    <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { "data-controller": 'form', "data-turbo": false }) do |f| %>
       <div class="field label round border">
         <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
         <%= f.label :email %><br />

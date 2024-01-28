@@ -105,7 +105,12 @@ module Chats
                        .ransack(query.q)
                        .result
 
-        chats.map do |chat|
+        result = pagy_countless(chats, items: query.page_size, page: query.page)
+
+        pagy_metadata = result[0]
+        paginated_data = result[1]
+
+        chats_dtos = paginated_data.map do |chat|
           map_into(
             chat,
             GetChatsListDto,
@@ -114,6 +119,11 @@ module Chats
             }
           )
         end
+
+        PaginationDto.new(
+          data: chats_dtos,
+          pagination: pagy_metadata
+        )
       end
 
       def get_chat(id)

@@ -2,14 +2,14 @@ class ApplicationService
   include Import[event_publisher: 'events.publisher']
   include Pagy::Backend
 
-  def paginate_collection(collection:, mapper:, page:, page_size:, filter:, size: 5)
+  def paginate_collection(collection:, mapper:, page:, page_size:, filter:, size: 5, options: {})
     result = pagy(collection.ransack(filter).result, items: page_size, page: page, size: size)
 
     pagy_metadata = result[0]
     paginated_data = result[1]
 
     PaginationDto.new(
-      data: map_into(paginated_data, mapper),
+      data: map_into(paginated_data, mapper, options),
       pagination: pagy_metadata
     )
   end

@@ -4,7 +4,7 @@ module Chats
       include Import.inject[chat_service: "chats.chat_service"]
 
       def index
-        @chats = chat_service.get_all_chats(
+        @paginated_result = chat_service.get_all_chats(
           ListQuery.new(
             page: params[:page] || 1,
             page_size: params[:page_size] || 10,

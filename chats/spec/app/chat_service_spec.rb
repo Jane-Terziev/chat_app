@@ -255,6 +255,7 @@ RSpec.describe Chats::App::ChatService, type: :unit do
       before do
         allow(chat_repository).to receive_message_chain(:joins, :where, :includes, :order, :ransack, :result) { chat_list }
         allow(chat_service).to receive(:map_into)
+        allow(chat_service).to receive(:pagy_countless) { [Pagy.new(count: 1000, page: 10, size: 5), chat_list]  }
         chat_list.each { |chat| allow(chat).to receive(:unread_messages) }
       end
 
