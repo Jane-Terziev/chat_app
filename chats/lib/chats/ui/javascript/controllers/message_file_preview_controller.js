@@ -14,29 +14,33 @@ export default class extends Controller {
             Array.from(attachmentsInput.files).forEach(attachment => {
                 let reader = new FileReader();
                 reader.onload = function (e) {
-                    let container = document.createElement('div');
-                    container.setAttribute('id', attachment.name);
-                    let badge = document.createElement('span');
-                    badge.classList.add('badge');
-                    badge.classList.add('circle');
-                    badge.classList.add('secondary');
-                    let icon = document.createElement('i');
-                    icon.innerHTML = 'close';
-                    icon.style.fontSize = '1rem';
-                    icon.setAttribute('data-action', `click->message-file-preview#removeFile`);
-                    icon.setAttribute('data-file-name', attachment.name);
-                    icon.style.cursor = 'pointer';
-                    badge.append(icon);
-                    let image = document.createElement('img');
-                    image.width = 40;
-                    image.height = 40;
-                    image.src = e.target.result;
+                    let container = `
+                    <div id="${attachment.name}" class="small-margin">
+                      <span class="badge circle secondary">
+                        <i style="font-size: 1rem; cursor: pointer;" 
+                           data-action="click->message-file-preview#removeFile"
+                           data-file-name="${attachment.name}"
+                        >
+                          close
+                        </i>
+                      </span>`;
 
-                    container.append(badge);
-                    container.append(image)
-
-                    container.classList.add('small-margin')
-                    attachmentsRow.append(container);
+                    if(attachment.type === 'application/pdf') {
+                        let pdf_div = `
+                          <div class="center-align">
+                            <i>picture_as_pdf</i>
+                            <p class="small-text">${attachment.name}</p>
+                          </div>
+                        `
+                        container += pdf_div
+                    } else {
+                        let image = `
+                         <img src="${e.target.result}" width="40" height="40">
+                        `
+                        container += image;
+                    }
+                    container += `</div>`
+                    attachmentsRow.innerHTML += container;
                 };
                 reader.readAsDataURL(attachment);
             });
