@@ -2,7 +2,7 @@
   <div id="chatMessageContainer">
     <div data-controller="drawer" data-drawer-element-id-value="chatSettingsDrawer">
       <%= render 'settings_drawer', chat: chat %>
-      <%= render 'chats/ui/participants/participants_dialog', chat: chat %>
+      <%= render 'chats/ui/participants/participants_dialog', chat_id: chat.id, participants: chat.chat_participants %>
       <div class="row" id="<%= chat.id %>">
         <div class="max">
           <h6 class="cut-text"><%= chat.name %></h6>

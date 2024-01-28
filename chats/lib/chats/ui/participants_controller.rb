@@ -3,8 +3,13 @@ module Chats
     class ParticipantsController < ApplicationController
       include Import.inject[chat_service: 'chats.chat_service']
 
+      def index
+        participants = chat_service.get_chat_participants(params[:chat_id])
+        render :index, locals: { participants: participants }
+      end
+
       def create
-        chat_participant_dto = chat_service.add_chat_participants(
+        chat_participants_dto = chat_service.add_chat_participants(
           validator.validate(params[:chat]&.to_unsafe_h, AddChatParticipantValidator.new, { chat_id: params[:chat_id] })
         )
 
@@ -14,12 +19,12 @@ module Chats
           turbo_stream.replace(
             'chatParticipantList',
             partial: 'participant_list',
-            locals: { chat: chat_participant_dto }
+            locals: { participants: chat_participants_dto, chat_id: params[:chat_id] }
           ),
           turbo_stream.replace(
             'addChatParticipantDialog',
             partial: 'participants_dialog',
-            locals: { chat: chat_participant_dto }
+            locals: { chat_id: params[:chat_id], participants: chat_participants_dto }
           )
         ], status: 201
       rescue ConstraintError => e
@@ -44,7 +49,7 @@ module Chats
           turbo_stream.replace(
             'addChatParticipantDialog',
             partial: 'participants_dialog',
-            locals: { chat: chat_participant_dto }
+            locals: { chat_id: params[:chat_id], participants: chat_participant_dto }
           )
         ]
       end

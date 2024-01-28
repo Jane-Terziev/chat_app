@@ -11,7 +11,7 @@
 
   <%= render 'chats/ui/participants/form',
              form: Chats::Ui::AddChatParticipantValidator.new,
-             chat_id: chat.id,
-             participants: chat.chat_participants
+             chat_id: chat_id,
+             participants: participants
   %>
 </dialog>

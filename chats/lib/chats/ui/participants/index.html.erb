@@ -1,0 +1,3 @@
+<%= turbo_frame_tag 'participants_list' do %>
+  <%= render 'chats/ui/participants/participant_list', participants: participants, chat_id: params[:chat_id] %>
+<% end %>

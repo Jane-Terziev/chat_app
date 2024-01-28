@@ -14,7 +14,7 @@ RSpec.describe Chats::App::ChatService, type: :unit do
   let(:current_user_repository) { spy(CurrentUserRepository) }
   let(:current_user) { instance_double(User) }
   let(:current_user_id) { SecureRandom.uuid }
-  let(:chat) { instance_double(Chats::Domain::Chat, id: SecureRandom.uuid, domain_events: []) }
+  let(:chat) { instance_double(Chats::Domain::Chat, id: SecureRandom.uuid, domain_events: [], chat_participants: []) }
 
 
   before do
@@ -215,7 +215,7 @@ RSpec.describe Chats::App::ChatService, type: :unit do
         expect(chat).to have_received(:add_chat_participants).with(user_ids: command.user_ids)
         expect(chat_repository).to have_received(:save!).with(chat)
         expect(chat_service).to have_received(:publish_all).with(chat)
-        expect(chat_service).to have_received(:map_into).with(chat, Chats::App::GetChatParticipantDto)
+        expect(chat_service).to have_received(:map_into).with(chat.chat_participants, Chats::App::ChatParticipantDto)
       end
     end
   end
@@ -247,7 +247,7 @@ RSpec.describe Chats::App::ChatService, type: :unit do
         expect(chat).to have_received(:remove_chat_participant).with(user_id: user_id)
         expect(chat_repository).to have_received(:save!).with(chat)
         expect(chat_service).to have_received(:publish_all).with(chat)
-        expect(chat_service).to have_received(:map_into).with(chat, Chats::App::GetChatParticipantDto)
+        expect(chat_service).to have_received(:map_into).with(chat.chat_participants, Chats::App::ChatParticipantDto)
       end
     end
   end

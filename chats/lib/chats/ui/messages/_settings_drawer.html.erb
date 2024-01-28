@@ -18,7 +18,11 @@
       </article>
     </summary>
 
-    <%= render 'chats/ui/participants/participant_list', chat: chat %>
+    <%= turbo_frame_tag 'participants_list',
+                        loading: :lazy,
+                        src: chat_participants_path(chat_id: chat.id),
+                        format: :turbo_stream do %>
+    <% end %>
 
     <div class="row wave round medium-padding" onclick="document.getElementById('addChatParticipantDialog').show()">
       <i>person_add</i>

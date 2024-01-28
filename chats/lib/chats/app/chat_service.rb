@@ -74,7 +74,7 @@ module Chats
 
       def add_chat_participants(command)
         chat = ActiveRecord::Base.transaction do
-          chat = chat_repository.find(command.chat_id)
+          chat = chat_repository.includes(chat_participants: :user).find(command.chat_id)
           chat.add_chat_participants(user_ids: command.user_ids)
 
           chat_repository.save!(chat)
@@ -82,19 +82,19 @@ module Chats
 
         publish_all(chat)
 
-        map_into(chat, GetChatParticipantDto)
+        map_into(chat.chat_participants, ChatParticipantDto)
       end
 
       def remove_chat_participant(chat_id, user_id)
         chat = ActiveRecord::Base.transaction do
-          chat = chat_repository.find(chat_id)
+          chat = chat_repository.includes(:chat_participants).find(chat_id)
           chat.remove_chat_participant(user_id: user_id)
           chat_repository.save!(chat)
         end
 
         publish_all(chat)
 
-        map_into(chat, GetChatParticipantDto)
+        map_into(chat.chat_participants, ChatParticipantDto)
       end
 
 
@@ -155,6 +155,10 @@ module Chats
           data: chat_dto,
           pagination: pagy_metadata
         )
+      end
+
+      def get_chat_participants(chat_id)
+        map_into(chat_repository.includes(chat_participants: :user).find(chat_id).chat_participants, ChatParticipantDto)
       end
     end
   end
