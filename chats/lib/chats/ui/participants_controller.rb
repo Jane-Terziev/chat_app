@@ -8,6 +8,11 @@ module Chats
         render :index, locals: { participants: participants }
       end
 
+      def new
+        participants = chat_service.get_chat_participants(params[:chat_id])
+        render :new, locals: { form: AddChatParticipantValidator.new, participants: participants }
+      end
+
       def create
         chat_participants_dto = chat_service.add_chat_participants(
           validator.validate(params[:chat]&.to_unsafe_h, AddChatParticipantValidator.new, { chat_id: params[:chat_id] })
@@ -28,16 +33,8 @@ module Chats
           )
         ], status: 201
       rescue ConstraintError => e
-        chat_participant_dto = DryObjectMapper::Mapper.call(
-          ::Chats::Domain::Chat.find(params[:chat_id]),
-          ::Chats::App::GetChatParticipantDto
-        )
-
-        render partial: 'form', locals: {
-          form: e.validator,
-          chat_id: params[:chat_id],
-          participants: chat_participant_dto.chat_participants
-        }, status: 422
+        participants = chat_service.get_chat_participants(params[:chat_id])
+        render :new, locals: { form: e.validator, chat_id: params[:chat_id], participants: participants }, status: 422
       end
 
       def destroy

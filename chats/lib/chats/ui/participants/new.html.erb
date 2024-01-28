@@ -1,0 +1,7 @@
+<%= turbo_frame_tag 'participant_form' do %>
+  <%= render 'chats/ui/participants/form',
+             form: form,
+             chat_id: params[:chat_id],
+             participants: participants
+  %>
+<% end %>

@@ -9,9 +9,5 @@
   </header>
   <div class="large-divider"></div>
 
-  <%= render 'chats/ui/participants/form',
-             form: Chats::Ui::AddChatParticipantValidator.new,
-             chat_id: chat_id,
-             participants: participants
-  %>
+  <%= turbo_frame_tag 'participant_form', loading: :lazy, src: new_chat_participant_path(chat_id: params[:chat_id]) %>
 </dialog>

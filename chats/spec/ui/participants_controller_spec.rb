@@ -66,7 +66,7 @@ RSpec.describe Chats::Ui::ParticipantsController, type: :controller do
         it 'should return a form with an error' do
           subject
           expect(response.status).to eq(422)
-          expect(response).to render_template 'chats/ui/participants/_form'
+          expect(response).to render_template 'chats/ui/participants/new'
         end
       end
     end
