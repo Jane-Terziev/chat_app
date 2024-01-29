@@ -6,8 +6,8 @@ module Chats
           data[:chat_id]
         end
 
-        def participant_user_ids
-          data[:participant_user_ids]
+        def chat_participant_user_ids
+          data[:chat_participant_user_ids]
         end
       end
     end

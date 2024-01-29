@@ -9,6 +9,10 @@ module Chats
         def message_id
           data[:message_id]
         end
+
+        def chat_participant_user_ids
+          data[:chat_participant_user_ids]
+        end
       end
     end
   end

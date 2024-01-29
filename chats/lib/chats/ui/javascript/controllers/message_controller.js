@@ -5,7 +5,7 @@ export default class extends Controller {
     connect() {
         if(this.scrollValue === true) {
             const messageContainer = document.getElementById('messageContainer');
-            messageContainer.scrollTop = messageContainer.scrollHeight;
+            messageContainer.parentElement.scrollTop = messageContainer.scrollHeight;
         }
 
         if(this.acknowledgeValue === true) {

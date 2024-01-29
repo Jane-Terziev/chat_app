@@ -1,9 +1,9 @@
 <div id="<%= message.id %>" class="grid" data-controller="message"
      data-message-scroll-value="<%= should_scroll %>"
-     data-message-acknowledge-url-value="<%= chat_acknowledge_path(chat_id: message.chat_participant.chat_id) %>"
+     data-message-acknowledge-url-value="<%= chat_acknowledge_path(chat_id: message.chat_id) %>"
      data-message-acknowledge-value="<%= acknowledge %>"
 >
-  <% if message.chat_participant.user_id == user_id %>
+  <% if message.user_id == user_id %>
     <div class="s12 m12 l6"></div>
     <div class="s12 m12 l6">
       <% if message.message.present? %>
@@ -13,7 +13,7 @@
               <button class="circle messageOptions">
                 <i>more_vert</i>
                 <menu class="right no-wrap">
-                  <%= link_to 'Remove', chat_message_path(id: message.id, chat_id: message.chat_participant.chat_id), data: { "turbo-method": :delete } %>
+                  <%= link_to 'Remove', chat_message_path(id: message.id, chat_id: message.chat_id), data: { "turbo-method": :delete } %>
                 </menu>
               </button>
             </div>
@@ -52,30 +52,30 @@
               <button class="circle messageOptions">
                 <i>more_vert</i>
                 <menu class="right no-wrap">
-                  <%= link_to 'Remove', chat_message_path(id: message.id, chat_id: message.chat_participant.chat_id), data: { "turbo-method": :delete } %>
+                  <%= link_to 'Remove', chat_message_path(id: message.id, chat_id: message.chat_id), data: { "turbo-method": :delete } %>
                 </menu>
               </button>
             </div>
-            <% message.attachment_files.each do |file| %>
-              <% if file.content_type.include?('image') %>
-              <div class="max">
-                <%= image_tag(
-                      file.url,
-                      style: 'width: 100%; height: auto; cursor: pointer;',
-                      "data-controller": 'image-preview',
-                      "data-image-preview-image-url-value": file.url,
-                      "data-action": "click->image-preview#preview"
-                    ) %>
-                <p class="tooltip no-space bottom"
-                   data-controller="chat-date-formatter"
-                   data-chat-date-formatter-timestamp-value="<%= message.created_at.as_json %>"
-                >
-                </p>
-              </div>
+            <% if message.attachment_file.present? %>
+              <% if message.attachment_file.content_type.include?('image') %>
+                <div class="max">
+                  <%= image_tag(
+                        message.attachment_file.url,
+                        style: 'width: 100%; height: auto; cursor: pointer;',
+                        "data-controller": 'image-preview',
+                        "data-image-preview-image-url-value": message.attachment_file.url,
+                        "data-action": "click->image-preview#preview"
+                      ) %>
+                  <p class="tooltip no-space bottom"
+                     data-controller="chat-date-formatter"
+                     data-chat-date-formatter-timestamp-value="<%= message.created_at.as_json %>"
+                  >
+                  </p>
+                </div>
               <% else %>
-                <a href="<%= file.url %>" target="_blank" class="secondary round small-padding">
+                <a href="<%= message.attachment_file.url %>" target="_blank" class="secondary round small-padding">
                   <i style="font-size: 30px">description</i>
-                  <p style="margin-left: 0.5rem;"><%= file.filename %></p>
+                  <p style="margin-left: 0.5rem;"><%= message.attachment_file.filename %></p>
                   <p class="tooltip no-space bottom"
                      data-controller="chat-date-formatter"
                      data-chat-date-formatter-timestamp-value="<%= message.created_at.as_json %>"
@@ -128,14 +128,14 @@
             <div class="small-margin">
               <%= image_tag 'profile.jpeg', class: 'circle small' %>
             </div>
-            <% message.attachment_files.each do |file| %>
-              <% if file.content_type.include?('image') %>
+            <% if message.attachment_file.present? %>
+              <% if message.attachment_file.content_type.include?('image') %>
                 <div class="max">
                   <%= image_tag(
-                        file.url,
+                        message.attachment_file.url,
                         style: 'width: 100%; height: auto; cursor: pointer;',
                         "data-controller": 'image-preview',
-                        "data-image-preview-image-url-value": file.url,
+                        "data-image-preview-image-url-value": message.attachment_file.url,
                         "data-action": "click->image-preview#preview"
                       ) %>
                   <p class="tooltip no-space bottom"
@@ -145,9 +145,9 @@
                   </p>
                 </div>
               <% else %>
-                <a href="<%= file.url %>" target="_blank" class="secondary round small-padding">
+                <a href="<%= message.attachment_file.url %>" target="_blank" class="secondary round small-padding">
                   <i style="font-size: 30px">description</i>
-                  <p style="margin-left: 0.5rem;"><%= file.filename %></p>
+                  <p style="margin-left: 0.5rem;"><%= message.attachment_file.filename %></p>
                   <p class="tooltip no-space bottom"
                      data-controller="chat-date-formatter"
                      data-chat-date-formatter-timestamp-value="<%= message.created_at.as_json %>"

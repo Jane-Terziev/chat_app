@@ -4,7 +4,7 @@ module Chats
       self.table_name = "chats"
 
       has_many :chat_participants, autosave: true, dependent: :destroy
-      has_many :unacknowledged_messages, autosave: true
+      has_many :unacknowledged_messages, autosave: true, dependent: :destroy
 
       def self.ransackable_attributes(auth_object = nil)
         %w[name]
@@ -22,7 +22,7 @@ module Chats
           user_id: user_id
         )
 
-        chat.apply_event(CreatedEvent.new(data: { chat_id: id, participant_user_ids: user_ids }))
+        chat.apply_event(CreatedEvent.new(data: { chat_id: id, chat_participant_user_ids: user_ids }))
         chat
       end
 
@@ -41,6 +41,7 @@ module Chats
 
       def send_message(user_id:, message:, attachments: [])
         chat_participant = chat_participants.find { |it| it.user_id == user_id }
+        new_messages = []
 
         if message.present?
           chat_message = Message.new(
@@ -48,16 +49,20 @@ module Chats
             message: message,
             unacknowledged_messages: chat_participants.filter { |it| it.user_id != user_id }.map do |participant|
               UnacknowledgedMessage.new(user_id: participant.user_id, chat_id: self.id)
-            end
+            end,
+            chat_id: self.id
           )
 
           chat_participant.messages << chat_message
+
+          new_messages << chat_message
 
           apply_event(
             MessageSentEvent.new(
               data: {
                 chat_id: self.id,
-                message_id: chat_message.id
+                message_id: chat_message.id,
+                chat_participant_user_ids: chat_participants.map(&:user_id)
               }
             )
           )
@@ -70,49 +75,39 @@ module Chats
               unacknowledged_messages: chat_participants.filter { |it| it.user_id != user_id }.map do |participant|
                 UnacknowledgedMessage.new(user_id: participant.user_id, chat_id: self.id)
               end,
-              attachments: [attachment]
+              attachment: attachment,
+              chat_id: self.id
             )
+
             chat_participant.messages << chat_message
+
+            new_messages << chat_message
+
             apply_event(
               MessageSentEvent.new(
                 data: {
                   chat_id: self.id,
-                  message_id: chat_message.id
+                  message_id: chat_message.id,
+                  chat_participant_user_ids: chat_participants.map(&:user_id)
                 }
               )
             )
           end
         end
 
-        self
+        new_messages
       end
 
-      def remove_message(message_id:, user_id:)
-        message = chat_participants.find do |it|
-          it.user_id == user_id
-        end.messages.find { |it| it.id == message_id }
-
-        raise ActiveRecord::RecordNotFound unless message.present?
-
-        message.mark_for_destruction
-
+      def apply_message_removed_event(message_id:)
         apply_event(
           MessageRemovedEvent.new(
             data: {
               chat_id: self.id,
               message_id: message_id,
-              participant_user_ids: chat_participants.map(&:user_id)
+              chat_participant_user_ids: chat_participants.map(&:user_id)
             }
           )
         )
-        self
-      end
-
-      def acknowledge_messages(user_id:)
-        unacknowledged_messages.filter { |it| it.user_id == user_id }.each do |unacknowledged_message|
-          unacknowledged_message.mark_for_destruction
-        end
-
         self
       end
 
@@ -126,12 +121,6 @@ module Chats
       end
 
       def remove_chat_participant(user_id:)
-        participant = chat_participants.find {|it| it.user_id == user_id }
-
-        raise ActiveRecord::RecordNotFound unless participant.present?
-
-        participant.mark_for_destruction
-
         apply_event(
           ChatParticipantRemovedEvent.new(
             data: {
@@ -142,25 +131,6 @@ module Chats
           )
         )
         self
-      end
-
-      def messages
-        chat_participants.map(&:messages).flatten.sort_by { |it| it.created_at }
-      end
-
-      def last_message
-        chat_message = messages.last
-        return "" unless chat_message.present?
-        return chat_message.message if chat_message.message.present?
-        "Attachment Sent."
-      end
-
-      def last_message_timestamp
-        messages.last&.created_at
-      end
-
-      def unread_messages(user_id)
-        unacknowledged_messages.filter { |it| it.user_id == user_id }.size
       end
     end
   end

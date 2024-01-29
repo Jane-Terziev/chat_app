@@ -1,7 +1,7 @@
 module Chats
   module Ui
     class ChatMessageListListener < AsyncEventHandler
-      include Import.active_job[chat_repository: 'chats.chat_repository', message_repository: 'chats.message_repository']
+      include Import.active_job[message_list_view_repository: 'chats.message_list_view_repository']
 
       def call(event)
         send "broadcast_#{event.class.name.demodulize}", event
@@ -10,18 +10,15 @@ module Chats
       private
 
       def broadcast_MessageSentEvent(event)
-        chat = chat_repository.find(event.chat_id)
-        message = message_repository.find(event.message_id)
-        chat.chat_participants.each do |participant|
-          next if participant.user_id == event.current_user_id
-
+        user_ids = event.chat_participant_user_ids - [event.current_user_id]
+        message_list_view_repository.where(id: event.message_id, user_id: user_ids).each do |message|
           Turbo::StreamsChannel.broadcast_append_to(
-            [chat.id, participant.user_id],
+            [event.chat_id, message.user_id],
             target: 'messageContainer',
             partial: 'chats/ui/messages/message_list_item',
             locals: {
               message: ::DryObjectMapper::Mapper.call(message, ::Chats::App::MessageDto),
-              user_id: participant.user_id,
+              user_id: event.current_user_id,
               should_scroll: true,
               acknowledge: true
             }
@@ -30,11 +27,9 @@ module Chats
       end
 
       def broadcast_MessageRemovedEvent(event)
-        event.participant_user_ids.each do |user_id|
-          Turbo::StreamsChannel.broadcast_remove_to(
-            [event.chat_id, user_id],
-            target: event.message_id
-          )
+        user_ids = event.chat_participant_user_ids - [event.current_user_id]
+        user_ids.each do |user_id|
+          Turbo::StreamsChannel.broadcast_remove_to([event.chat_id, user_id], target: event.message_id)
         end
       end
 

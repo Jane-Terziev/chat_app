@@ -15,8 +15,8 @@ module Chats
 
       def create
         chat = chat_service.create_chat(validator.validate(chat_params, CreateChatValidator.new))
-
         flash.now[:success] = 'Chat was successfully created!'
+
         render turbo_stream: [
           turbo_stream.replace('flash', partial: "shared/flash"),
           turbo_stream.prepend('chats', partial: 'chat_list_item', locals: { chat: chat, move_to_top: false }),

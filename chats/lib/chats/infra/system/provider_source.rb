@@ -2,6 +2,8 @@ Dry::System.register_provider_source(:chats, group: :chats) do
   prepare do
     register("chats.chat_repository") { Chats::Domain::Chat }
     register("chats.message_repository") { Chats::Domain::Message }
+    register('chats.chat_list_view_repository') { Chats::Domain::ReadModel::ChatListView }
+    register('chats.message_list_view_repository') { Chats::Domain::ReadModel::MessageListView }
     register("chats.chat_service") { Chats::App::ChatService.new }
   end
 

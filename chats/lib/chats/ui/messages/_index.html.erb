@@ -1,13 +1,13 @@
 <%= turbo_frame_tag 'chat_messages' do %>
   <div id="chatMessageContainer">
     <div data-controller="drawer" data-drawer-element-id-value="chatSettingsDrawer">
-      <%= render 'settings_drawer', chat: chat %>
-      <%= render 'chats/ui/participants/participants_dialog', chat_id: chat.id %>
-      <div class="row" id="<%= chat.id %>">
+      <%= render 'settings_drawer', chat: paginated_result.data %>
+      <%= render 'chats/ui/participants/participants_dialog', chat_id: paginated_result.data.id %>
+      <div class="row" id="<%= paginated_result.data.id %>">
         <div class="max">
-          <h6 class="cut-text"><%= chat.name %></h6>
+          <h6 class="cut-text"><%= paginated_result.data.name %></h6>
           <p class="max tooltip no-space top">
-            <%= chat.name %>
+            <%= paginated_result.data.name %>
           </p>
         </div>
         <i style="cursor:pointer;" data-action="click->drawer#toggle">more_horiz</i>
@@ -15,12 +15,12 @@
       <div class="large-divider"></div>
     </div>
 
-    <%= turbo_stream_from [chat.id, current_user.id] %>
+    <%= turbo_stream_from [paginated_result.data.id, current_user.id] %>
 
-    <%= render 'messages_list', chat: chat, user_id: current_user.id %>
+    <%= render 'messages_list', paginated_result: paginated_result, user_id: current_user.id %>
 
     <div style="margin-top: 2rem;">
-      <%= render 'form', chat_id: chat.id, form: Chats::Ui::SendMessageValidator.new  %>
+      <%= render 'form', chat_id: paginated_result.data.id, form: Chats::Ui::SendMessageValidator.new  %>
     </div>
   </div>
 <% end %>

@@ -174,7 +174,7 @@ GEM
       dry-initializer (~> 3.0)
       dry-schema (>= 1.12, < 2)
       zeitwerk (~> 2.6)
-    dry_object_mapper (0.1.0)
+    dry_object_mapper (0.1.2)
       dry-struct (~> 1)
       dry_struct_parser
     dry_struct_generator (0.3.1)
@@ -356,6 +356,9 @@ GEM
       sprockets (> 3.0)
       sprockets-rails
       tilt
+    scenic (1.7.0)
+      activerecord (>= 4.0.0)
+      railties (>= 4.0.0)
     selenium-webdriver (4.17.0)
       base64 (~> 0.2)
       rexml (~> 3.2, >= 3.2.5)
@@ -440,6 +443,7 @@ DEPENDENCIES
   rinku
   rspec-rails
   sass-rails
+  scenic
   selenium-webdriver
   sidekiq
   sprockets-rails

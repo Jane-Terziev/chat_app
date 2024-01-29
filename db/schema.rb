@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_01_27_211151) do
+ActiveRecord::Schema[7.1].define(version: 2024_01_29_080931) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -62,8 +62,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_27_211151) do
   create_table "messages", id: { type: :string, limit: 36 }, force: :cascade do |t|
     t.string "message"
     t.string "chat_participant_id"
+    t.string "chat_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["chat_id"], name: "index_messages_on_chat_id"
     t.index ["chat_participant_id"], name: "index_messages_on_chat_participant_id"
   end
 
@@ -99,7 +101,43 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_27_211151) do
   add_foreign_key "chat_participants", "users"
   add_foreign_key "chats", "users"
   add_foreign_key "messages", "chat_participants"
+  add_foreign_key "messages", "chats"
   add_foreign_key "unacknowledged_messages", "chats"
   add_foreign_key "unacknowledged_messages", "messages"
   add_foreign_key "unacknowledged_messages", "users"
+
+  create_view "chat_list_views", sql_definition: <<-SQL
+      SELECT c.id,
+      c.name,
+      cp.user_id,
+      last_message.message AS last_message,
+      last_message.created_at AS last_message_timestamp,
+      COALESCE(um.unread_messages_count, (0)::bigint) AS unread_messages_count,
+      c.created_at,
+      c.updated_at
+     FROM (((chats c
+       JOIN chat_participants cp ON (((c.id)::text = (cp.chat_id)::text)))
+       LEFT JOIN ( SELECT messages.chat_id,
+              messages.message,
+              messages.created_at
+             FROM (messages
+               JOIN ( SELECT messages_1.chat_id,
+                      max(messages_1.created_at) AS max_created_at
+                     FROM messages messages_1
+                    GROUP BY messages_1.chat_id) m ON ((((m.chat_id)::text = (messages.chat_id)::text) AND (m.max_created_at = messages.created_at))))) last_message ON (((last_message.chat_id)::text = (c.id)::text)))
+       LEFT JOIN ( SELECT unacknowledged_messages.chat_id,
+              unacknowledged_messages.user_id,
+              count(*) AS unread_messages_count
+             FROM unacknowledged_messages
+            GROUP BY unacknowledged_messages.chat_id, unacknowledged_messages.user_id) um ON ((((c.id)::text = (um.chat_id)::text) AND ((cp.user_id)::text = (um.user_id)::text))));
+  SQL
+  create_view "message_list_views", sql_definition: <<-SQL
+      SELECT m.id,
+      m.chat_id,
+      m.message,
+      cp.user_id,
+      m.created_at
+     FROM (messages m
+       JOIN chat_participants cp ON (((m.chat_participant_id)::text = (cp.id)::text)));
+  SQL
 end

@@ -4,7 +4,9 @@ module Chats
       include Import[
                 chat_repository: "chats.chat_repository",
                 message_repository: "chats.message_repository",
-                current_user_repository: 'current_user_repository'
+                current_user_repository: 'current_user_repository',
+                chat_list_view_repository: 'chats.chat_list_view_repository',
+                message_list_view_repository: 'chats.message_list_view_repository'
               ]
 
       def create_chat(command)
@@ -20,7 +22,10 @@ module Chats
 
         publish_all(chat)
 
-        map_into(chat, GetChatsListDto, { unread_messages: 0 })
+        map_into(
+          chat_list_view_repository.find_by!(id: chat.id, user_id: current_user_repository.authenticated_identity.id),
+          GetChatsListDto
+        )
       end
 
       def delete_chat(id)
@@ -33,26 +38,36 @@ module Chats
       end
 
       def send_message(command)
-        chat = ActiveRecord::Base.transaction do
-          chat = chat_repository.includes(
-            chat_participants: [:user, messages: [:attachments_attachments, :attachments_blobs] ]
-          ).find(command.chat_id)
-          chat.send_message(
+        chat, new_messages = ActiveRecord::Base.transaction do
+          chat = chat_repository.find(command.chat_id)
+          new_messages = chat.send_message(
             user_id: current_user_repository.authenticated_identity.id,
             message: command.message,
             attachments: command.attachments
           )
-          chat_repository.save!(chat)
+          [chat_repository.save!(chat), new_messages]
         end
 
         publish_all(chat)
-
-        chat
+        [
+          map_into(
+            chat_list_view_repository.find_by!(id: chat.id, user_id: current_user_repository.authenticated_identity.id),
+            GetChatsListDto
+          ),
+          map_into(
+            new_messages,
+            MessageDto,
+            { user_id: current_user_repository.authenticated_identity.id, chat_id: command.chat_id }
+          )
+        ]
       end
 
       def acknowledge_messages(chat_id)
         chat = ActiveRecord::Base.transaction do
-          chat = chat_repository.includes(:unacknowledged_messages).find(chat_id)
+          chat = chat_repository.includes(:unacknowledged_messages)
+                                .where(unacknowledged_messages: { user_id: current_user_repository.authenticated_identity.id })
+                                .find(chat_id)
+
           chat.acknowledge_messages(user_id: current_user_repository.authenticated_identity.id)
           chat_repository.save!(chat)
         end
@@ -62,14 +77,22 @@ module Chats
 
       def remove_message(chat_id, message_id)
         chat = ActiveRecord::Base.transaction do
-          chat = chat_repository.includes(chat_participants: :messages).find(chat_id)
-          chat.remove_message(message_id: message_id, user_id: current_user_repository.authenticated_identity.id)
+          chat = chat_repository.find(chat_id)
+
+          message_repository.joins(:chat_participant).where(
+            chat_participant: { user_id: current_user_repository.authenticated_identity.id, chat_id: chat_id }
+          ).find(message_id).destroy!
+
+          chat.apply_message_removed_event(message_id: message_id)
           chat_repository.save!(chat)
         end
 
         publish_all(chat)
 
-        map_into(chat, GetChatsListDto, { unread_messages: 0 })
+        map_into(
+          chat_list_view_repository.find_by!(id: chat_id, user_id: current_user_repository.authenticated_identity.id),
+          GetChatsListDto
+        )
       end
 
       def add_chat_participants(command)
@@ -89,6 +112,7 @@ module Chats
         chat = ActiveRecord::Base.transaction do
           chat = chat_repository.includes(:chat_participants).find(chat_id)
           chat.remove_chat_participant(user_id: user_id)
+
           chat_repository.save!(chat)
         end
 
@@ -99,9 +123,7 @@ module Chats
 
 
       def get_all_chats(query)
-        chats = chat_repository.joins(:chat_participants)
-                       .where(chat_participants: { user_id: current_user_repository.authenticated_identity.id })
-                       .includes(:unacknowledged_messages, chat_participants: :messages)
+        chats = chat_list_view_repository.where(user_id: current_user_repository.authenticated_identity.id)
                        .order('updated_at DESC')
                        .ransack(query.q)
                        .result
@@ -111,42 +133,43 @@ module Chats
         pagy_metadata = result[0]
         paginated_data = result[1]
 
-        chats_dtos = paginated_data.map do |chat|
-          map_into(
-            chat,
-            GetChatsListDto,
-            {
-              unread_messages: chat.unread_messages(current_user_repository.authenticated_identity.id)
-            }
-          )
-        end
 
         PaginationDto.new(
-          data: chats_dtos,
+          data: map_into(paginated_data, GetChatsListDto),
           pagination: pagy_metadata
         )
       end
 
       def get_chat(query)
         chat = ActiveRecord::Base.transaction do
-          chat = chat_repository.includes(:unacknowledged_messages, chat_participants: [:user]).find(query.chat_id)
-          chat.acknowledge_messages(user_id: current_user_repository.authenticated_identity.id)
+          chat = chat_repository.find(query.chat_id)
+          chat.unacknowledged_messages.where(user_id: current_user_repository.authenticated_identity.id).delete_all
           chat_repository.save!(chat)
         end
 
         publish_all(chat)
 
         pagy_metadata, paginated_data = pagy_countless(
-          message_repository.joins(:chat_participant)
-                                  .where(chat_participants: { chat_id: query.chat_id })
-                                  .includes(chat_participant: :user, attachments_attachments: :blob)
-                                  .order('created_at DESC'),
+          message_list_view_repository.where(chat_id: query.chat_id).order('created_at DESC'),
           items: query.page_size,
           page: query.page
         )
 
+        attachment_file_dtos = ::ActiveStorage::Attachment.includes(:blob).where(
+          record_type: 'Chats::Domain::Message',
+          record_id: paginated_data.map(&:id)
+        ).map  do |attachment_file|
+          ::Chats::Domain::FileDto.new(
+            message_id: attachment_file.record_id,
+            url: attachment_file.url,
+            content_type: attachment_file.content_type,
+            filename: attachment_file.filename.to_s
+          )
+        end
+
         message_dtos = paginated_data.map do |message|
-          map_into(message, MessageDto)
+          attachment_file = attachment_file_dtos.find { |it| it.message_id == message.id }
+          map_into(message, MessageDto, { attachment_file: attachment_file })
         end
 
         chat_dto = map_into(chat, GetChatDetailsDto, { messages: message_dtos.reverse })

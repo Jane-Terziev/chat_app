@@ -88,3 +88,4 @@ gem 'rails_event_store', '~> 2.2'
 gem 'psych', '~> 3.3' # https://bugs.ruby-lang.org/issues/17866
 
 gem 'devise'
+gem 'scenic'

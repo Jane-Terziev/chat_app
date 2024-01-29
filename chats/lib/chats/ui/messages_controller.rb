@@ -14,7 +14,7 @@ module Chats
         )
 
         render turbo_stream: [
-          turbo_stream.replace('chat_messages', partial: 'index', locals: { chat: paginated_result.data }),
+          turbo_stream.replace('chat_messages', partial: 'index', locals: { paginated_result: paginated_result }),
           turbo_stream.remove("#{params[:chat_id]}UnreadMessageCounter")
         ]
       end
@@ -31,20 +31,26 @@ module Chats
       end
 
       def create
-        chat = chat_service.send_message(
+        chat_dto, new_messages_dto = chat_service.send_message(
           validator.validate(message_params, SendMessageValidator.new, { chat_id: params[:chat_id] })
         )
 
-        chat_list_dto = ::DryObjectMapper::Mapper.call(chat, ::Chats::App::GetChatsListDto, { unread_messages: 0 })
-        chat_details_dto = ::DryObjectMapper::Mapper.call(chat, ::Chats::App::GetChatDetailsDto)
+        append_message_streams = new_messages_dto.map do |new_message_dto|
+          turbo_stream.append(
+            'messageContainer',
+            partial: 'message_list_item',
+            locals: { message: new_message_dto, user_id: current_user.id, should_scroll: true, acknowledge: false }
+          )
+        end
 
         render turbo_stream: [
-          turbo_stream.replace('chat_messages', partial: 'chats/ui/messages/index', locals: { chat: chat_details_dto }),
           turbo_stream.replace(
             params[:chat_id],
             partial: 'chats/ui/chats/chat_list_item',
-            locals: { chat: chat_list_dto, move_to_top: true }
-          )
+            locals: { chat: chat_dto, move_to_top: true }
+          ),
+          turbo_stream.replace('message_form', partial: 'form', locals: { form: SendMessageValidator.new, chat_id: params[:chat_id] }),
+          *append_message_streams
         ], status: 201
       rescue ConstraintError => e
         render partial: 'form', locals: { form: e.validator, chat_id: params[:chat_id] }, status: 422
