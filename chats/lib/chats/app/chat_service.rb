@@ -68,7 +68,7 @@ module Chats
                                 .where(unacknowledged_messages: { user_id: current_user_repository.authenticated_identity.id })
                                 .find(chat_id)
 
-          chat.acknowledge_messages(user_id: current_user_repository.authenticated_identity.id)
+          chat.unacknowledged_messages.delete_all
           chat_repository.save!(chat)
         end
 

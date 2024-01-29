@@ -31,7 +31,7 @@ module Chats
           DeletedEvent.new(
             data: {
               chat_id: self.id,
-              participant_user_ids: chat_participants.map(&:user_id)
+              chat_participant_user_ids: chat_participants.map(&:user_id)
             }
           )
         )
@@ -118,7 +118,11 @@ module Chats
           if existing_participant.present?
             existing_participant.status = ChatParticipant::STATUS['active'] if existing_participant.is_removed?
           else
-            chat_participants << ChatParticipant.new(id: SecureRandom.uuid, user_id: user_id)
+            chat_participants << ChatParticipant.new(
+              id: SecureRandom.uuid,
+              user_id: user_id,
+              status: ChatParticipant::STATUS['active']
+            )
           end
 
           apply_event(ChatParticipantAddedEvent.new(data: { chat_id: self.id, chat_participant_user_id: user_id }))

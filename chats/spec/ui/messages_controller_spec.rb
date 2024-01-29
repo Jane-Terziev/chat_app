@@ -111,7 +111,7 @@ RSpec.describe Chats::Ui::MessagesController, type: :controller do
     end
 
     context "when the user is not authenticated" do
-      subject { delete :destroy, params: { id: chat.messages.first.id, chat_id: chat.id } }
+      subject { delete :destroy, params: { id: chat.chat_participants.first.messages.first.id, chat_id: chat.id } }
 
       it 'should redirect to sessions page' do
         subject
@@ -128,7 +128,7 @@ RSpec.describe Chats::Ui::MessagesController, type: :controller do
       end
 
       context 'when the chat is not found' do
-        subject { delete :destroy, params: { id: chat.messages.first.id, chat_id: SecureRandom.uuid } }
+        subject { delete :destroy, params: { id: chat.chat_participants.first.messages.first.id, chat_id: SecureRandom.uuid } }
         render_views
 
         it 'should raise a ActiveRecord::RecordNotFound error' do
@@ -146,7 +146,7 @@ RSpec.describe Chats::Ui::MessagesController, type: :controller do
       end
 
       context "when chat and message exist" do
-        subject { delete :destroy, params: { id: chat.messages.first.id, chat_id: chat.id } }
+        subject { delete :destroy, params: { id: chat.chat_participants.first.messages.first.id, chat_id: chat.id } }
         render_views
 
         it 'should delete the message' do

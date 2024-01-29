@@ -190,8 +190,8 @@ RSpec.describe Chats::Ui::ChatsController, type: :controller do
         render_views
 
         before do
-          chats[0].chat_participants << Chats::Domain::ChatParticipant.new(id: SecureRandom.uuid, user_id: current_user.id)
-          chats[0].chat_participants << Chats::Domain::ChatParticipant.new(id: SecureRandom.uuid, user_id: other_user.id)
+          chats[0].add_chat_participants(user_ids: [current_user.id])
+          chats[0].add_chat_participants(user_ids: [other_user.id])
           chats[0].send_message(user_id: other_user.id, message: 'test')
           chats[0].save!
         end
@@ -240,17 +240,17 @@ RSpec.describe Chats::Ui::ChatsController, type: :controller do
         render_views
 
         before do
-          chats[0].chat_participants << Chats::Domain::ChatParticipant.new(id: SecureRandom.uuid, user_id: current_user.id)
+          chats[0].add_chat_participants(user_ids: [current_user.id])
           chats[0].save!
         end
 
         it 'should leave the chat' do
-          expect(Chats::Domain::ChatParticipant.count).to eq(1)
+          expect(Chats::Domain::ChatParticipant.where(status: 'active').count).to eq(1)
 
           subject
 
           expect(response.status).to eq(200)
-          expect(Chats::Domain::ChatParticipant.count).to eq(0)
+          expect(Chats::Domain::ChatParticipant.where(status: 'active').count).to eq(0)
         end
       end
     end

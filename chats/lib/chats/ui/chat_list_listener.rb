@@ -25,8 +25,6 @@ module Chats
 
       def broadcast_MessageRemovedEvent(event)
         user_ids = event.chat_participant_user_ids - [event.current_user_id]
-        puts "HERE"
-        puts user_ids
         chat_list_view_repository.where(id: event.chat_id, user_id: user_ids).each do |chat|
           broadcast_replace_stream(chat, false)
         end

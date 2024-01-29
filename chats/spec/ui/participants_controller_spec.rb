@@ -25,7 +25,7 @@ RSpec.describe Chats::Ui::ParticipantsController, type: :controller do
     Chats::Domain::Chat.create!(
       id: SecureRandom.uuid,
       name: 'string',
-      chat_participants: [Chats::Domain::ChatParticipant.new(id: SecureRandom.uuid, user_id: current_user.id)]
+      chat_participants: [Chats::Domain::ChatParticipant.new(id: SecureRandom.uuid, user_id: current_user.id, status: 'active')]
     )
   end
 
@@ -118,12 +118,12 @@ RSpec.describe Chats::Ui::ParticipantsController, type: :controller do
         render_views
 
         it 'should delete the message' do
-          expect(Chats::Domain::ChatParticipant.count).to eq(2)
+          expect(Chats::Domain::ChatParticipant.where(status: 'active').count).to eq(2)
 
           subject
 
           expect(response.status).to eq(200)
-          expect(Chats::Domain::ChatParticipant.count).to eq(1)
+          expect(Chats::Domain::ChatParticipant.where(status: 'active').count).to eq(1)
         end
       end
     end
