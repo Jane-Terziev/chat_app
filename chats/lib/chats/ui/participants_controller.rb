@@ -1,22 +1,24 @@
 module Chats
   module Ui
     class ParticipantsController < ApplicationController
-      include Import.inject[chat_service: 'chats.chat_service']
+      include Import.inject[chat_service: 'chats.chat_service', chat_read_service: 'chats.chat_read_service']
 
       def index
-        participants = chat_service.get_chat_participants(params[:chat_id])
+        participants = chat_read_service.get_active_chat_participants(params[:chat_id])
         render :index, locals: { participants: participants }
       end
 
       def new
-        participants = chat_service.get_chat_participants(params[:chat_id])
+        participants = chat_read_service.get_participants_select_options_for_chat(params[:chat_id])
         render :new, locals: { form: AddChatParticipantValidator.new, participants: participants }
       end
 
       def create
-        chat_participants_dto = chat_service.add_chat_participants(
+        chat_service.add_chat_participants(
           validator.validate(params[:chat]&.to_unsafe_h, AddChatParticipantValidator.new, { chat_id: params[:chat_id] })
         )
+
+        chat_participants_dto = chat_read_service.get_active_chat_participants(params[:chat_id])
 
         flash.now[:notice] = 'Users were successfully added to the chat!'
         render turbo_stream: [
@@ -33,12 +35,14 @@ module Chats
           )
         ], status: 201
       rescue ConstraintError => e
-        participants = chat_service.get_chat_participants(params[:chat_id])
+        participants = chat_service.get_active_chat_participants(params[:chat_id])
         render :new, locals: { form: e.validator, chat_id: params[:chat_id], participants: participants }, status: 422
       end
 
       def destroy
-        chat_participant_dto = chat_service.remove_chat_participant(params[:chat_id], params[:id])
+        chat_service.remove_chat_participant(params[:chat_id], params[:id])
+        chat_participants_dto = chat_read_service.get_active_chat_participants(params[:chat_id])
+
         flash.now[:notice] = 'User was successfully removed!'
         render turbo_stream: [
           turbo_stream.replace('flash', partial: 'shared/flash'),
@@ -46,7 +50,7 @@ module Chats
           turbo_stream.replace(
             'addChatParticipantDialog',
             partial: 'participants_dialog',
-            locals: { chat_id: params[:chat_id], participants: chat_participant_dto }
+            locals: { chat_id: params[:chat_id], participants: chat_participants_dto }
           )
         ]
       end

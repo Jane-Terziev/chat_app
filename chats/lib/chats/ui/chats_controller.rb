@@ -1,30 +1,34 @@
 module Chats
   module Ui
     class ChatsController < ApplicationController
-      include Import.inject[chat_service: "chats.chat_service"]
+      include Import.inject[chat_service: "chats.chat_service", chat_read_service: 'chats.chat_read_service']
 
       def index
-        @paginated_result = chat_service.get_all_chats(
+        @paginated_result = chat_read_service.get_all_chats(
           ListQuery.new(
             page: params[:page] || 1,
             page_size: params[:page_size] || 10,
             q: params[:q] || {}
           )
         )
+        @user_options = chat_read_service.get_participants_select_options_for_new_chat
       end
 
       def create
-        chat = chat_service.create_chat(validator.validate(chat_params, CreateChatValidator.new))
+        chat_id = chat_service.create_chat(validator.validate(chat_params, CreateChatValidator.new))
+        chat = chat_read_service.get_chat_list_dto(chat_id)
+        user_options = chat_read_service.get_participants_select_options_for_new_chat
+
         flash.now[:success] = 'Chat was successfully created!'
 
         render turbo_stream: [
           turbo_stream.replace('flash', partial: "shared/flash"),
           turbo_stream.prepend('chats', partial: 'chat_list_item', locals: { chat: chat, move_to_top: false }),
-          turbo_stream.replace('new_chat', partial: 'form', locals: { form: CreateChatValidator.new }),
-          turbo_stream.replace('newChatDialog', partial: 'new_dialog')
+          turbo_stream.replace('newChatDialog', partial: 'new_dialog', locals: { user_options: user_options })
         ], status: 201
       rescue ConstraintError => e
-        render partial: 'form', locals: { form: e.validator }, status: 422
+        user_options = chat_read_service.get_participants_select_options_for_new_chat
+        render partial: 'form', locals: { form: e.validator, user_options: user_options }, status: 422
       end
 
       def destroy

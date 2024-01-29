@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_01_29_080931) do
+ActiveRecord::Schema[7.1].define(version: 2024_01_29_172508) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -145,5 +145,15 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_29_080931) do
       m.created_at
      FROM (messages m
        JOIN chat_participants cp ON (((m.chat_participant_id)::text = (cp.id)::text)));
+  SQL
+  create_view "chat_participant_views", sql_definition: <<-SQL
+      SELECT cp.id,
+      cp.user_id,
+      cp.chat_id,
+      cp.status,
+      u.first_name,
+      u.last_name
+     FROM (chat_participants cp
+       JOIN users u ON (((cp.user_id)::text = (u.id)::text)));
   SQL
 end

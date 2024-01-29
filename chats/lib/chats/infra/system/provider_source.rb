@@ -2,9 +2,12 @@ Dry::System.register_provider_source(:chats, group: :chats) do
   prepare do
     register("chats.chat_repository") { Chats::Domain::Chat }
     register("chats.message_repository") { Chats::Domain::Message }
+    register("chats.unacknowledged_message_repository") { Chats::Domain::UnacknowledgedMessage }
     register('chats.chat_list_view_repository') { Chats::Domain::ReadModel::ChatListView }
     register('chats.message_list_view_repository') { Chats::Domain::ReadModel::MessageListView }
+    register('chats.chat_participant_view_repository') { Chats::Domain::ReadModel::ChatParticipantView }
     register("chats.chat_service") { Chats::App::ChatService.new }
+    register("chats.chat_read_service") { Chats::App::ReadModel::ChatService.new }
   end
 
   start do

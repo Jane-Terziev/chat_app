@@ -1,10 +1,11 @@
 module Chats
   module Ui
     class MessagesController < ApplicationController
-      include Import.inject[chat_service: 'chats.chat_service']
+      include Import.inject[chat_service: 'chats.chat_service', chat_read_service: 'chats.chat_read_service']
 
       def index
-        paginated_result = chat_service.get_chat(
+        chat_service.acknowledge_messages(params[:chat_id])
+        paginated_result = chat_read_service.get_chat(
           MessageListQuery.new(
             chat_id: params[:chat_id],
             page: params[:page] || 1,
@@ -20,7 +21,7 @@ module Chats
       end
 
       def load_more
-        @paginated_result = chat_service.get_chat(
+        @paginated_result = chat_read_service.get_chat(
           MessageListQuery.new(
             chat_id: params[:chat_id],
             page: params[:page] || 1,
@@ -31,9 +32,11 @@ module Chats
       end
 
       def create
-        chat_dto, new_messages_dto = chat_service.send_message(
+        new_messages_dto = chat_service.send_message(
           validator.validate(message_params, SendMessageValidator.new, { chat_id: params[:chat_id] })
         )
+
+        chat_dto = chat_read_service.get_chat_list_dto(params[:chat_id])
 
         append_message_streams = new_messages_dto.map do |new_message_dto|
           turbo_stream.append(
@@ -57,7 +60,9 @@ module Chats
       end
 
       def destroy
-        chat_dto = chat_service.remove_message(params[:chat_id], params[:id])
+        chat_service.remove_message(params[:chat_id], params[:id])
+        chat_dto = chat_read_service.get_chat_list_dto(params[:chat_id])
+
         flash.now[:notice] = 'Message was successfully removed!'
 
         render turbo_stream: [

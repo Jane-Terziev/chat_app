@@ -4,7 +4,7 @@ module Chats
       self.table_name = "chats"
 
       has_many :chat_participants, autosave: true, dependent: :destroy
-      has_many :unacknowledged_messages, autosave: true, dependent: :destroy
+      has_many :unacknowledged_messages, autosave: true, dependent: :delete_all
 
       def self.ransackable_attributes(auth_object = nil)
         %w[name]
@@ -18,7 +18,7 @@ module Chats
         chat = new(
           id: id,
           name: name,
-          chat_participants: user_ids.map { |it| ChatParticipant.new(id: SecureRandom.uuid, user_id: it) },
+          chat_participants: user_ids.map { |it| ChatParticipant.create_new(user_id: it, status: 'active') },
           user_id: user_id
         )
 
@@ -118,11 +118,7 @@ module Chats
           if existing_participant.present?
             existing_participant.status = ChatParticipant::STATUS['active'] if existing_participant.is_removed?
           else
-            chat_participants << ChatParticipant.new(
-              id: SecureRandom.uuid,
-              user_id: user_id,
-              status: ChatParticipant::STATUS['active']
-            )
+            chat_participants << ChatParticipant.create_new(user_id: user_id)
           end
 
           apply_event(ChatParticipantAddedEvent.new(data: { chat_id: self.id, chat_participant_user_id: user_id }))

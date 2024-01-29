@@ -3,7 +3,7 @@ module Chats
     class Message < ApplicationRecord
       self.table_name = "messages"
 
-      has_one_attached :attachment, dependent: :destroy
+      has_one_attached :attachment, dependent: :delete
       belongs_to :chat_participant
       has_many :unacknowledged_messages, dependent: :delete_all
 

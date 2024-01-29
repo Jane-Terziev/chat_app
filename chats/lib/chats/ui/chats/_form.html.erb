@@ -8,7 +8,7 @@
 
     <div class="<%= invalid?(form, :user_ids) %>">
       <%= select_tag 'chat[user_ids][]',
-                     options_for_select(User.all.where.not(id: current_user.id).map {|it| [it.email, it.id]}, form.params.dig(:user_ids)),
+                     options_for_select(user_options.map {|it| [it.full_name, it.id]}, form.params.dig(:user_ids)),
                      multiple: true,
                      id: 'chat_user_ids',
                      "data-controller": 'slim-select',

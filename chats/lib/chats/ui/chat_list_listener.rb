@@ -1,7 +1,9 @@
 module Chats
   module Ui
     class ChatListListener < AsyncEventHandler
-      include Import.active_job[chat_list_view_repository: 'chats.chat_list_view_repository']
+      include Import.active_job[
+                chat_list_view_repository: 'chats.chat_list_view_repository'
+              ]
 
       def call(event)
         send "broadcast_#{event.class.name.demodulize}", event
@@ -59,7 +61,7 @@ module Chats
           ['chats_list', chat.user_id],
           target: 'chats',
           partial: 'chats/ui/chats/chat_list_item',
-          locals: { chat: ::DryObjectMapper::Mapper.call(chat, ::Chats::App::GetChatsListDto), move_to_top: move_to_top }
+          locals: { chat: ::DryObjectMapper::Mapper.call(chat, ::Chats::App::ReadModel::GetChatsListDto), move_to_top: move_to_top }
         )
       end
 
@@ -68,7 +70,7 @@ module Chats
           ['chats_list', chat.user_id],
           target: chat.id,
           partial: 'chats/ui/chats/chat_list_item',
-          locals: { chat: ::DryObjectMapper::Mapper.call(chat, ::Chats::App::GetChatsListDto), move_to_top: move_to_top }
+          locals: { chat: ::DryObjectMapper::Mapper.call(chat, ::Chats::App::ReadModel::GetChatsListDto), move_to_top: move_to_top }
         )
       end
 

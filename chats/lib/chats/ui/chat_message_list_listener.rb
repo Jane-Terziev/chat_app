@@ -18,7 +18,7 @@ module Chats
             target: 'messageContainer',
             partial: 'chats/ui/messages/message_list_item',
             locals: {
-              message: ::DryObjectMapper::Mapper.call(message, ::Chats::App::MessageDto),
+              message: ::DryObjectMapper::Mapper.call(message, ::Chats::App::ReadModel::MessageDto),
               user_id: user_id,
               should_scroll: true,
               acknowledge: true
