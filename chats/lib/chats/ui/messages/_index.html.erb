@@ -20,7 +20,7 @@
 
     <%= render 'messages_list', paginated_result: paginated_result, user_id: current_user.id %>
 
-    <div style="margin-top: 2rem;">
+    <div>
       <%= render 'form', chat_id: paginated_result.data.id, form: Chats::Ui::SendMessageValidator.new  %>
     </div>
   </div>

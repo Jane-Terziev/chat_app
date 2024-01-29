@@ -1,10 +1,4 @@
-<dialog id="imagePreviewDialog" class="max" data-controller="image-preview">
-  <nav class="right-align">
-    <i class="small-margin" data-action="click->image-preview#close" style="cursor: pointer">close</i>
-  </nav>
-  <img id="imagePreviewContent" style="width: 100%; height: auto">
-</dialog>
-
+<%= render 'shared/image_preview_dialog' %>
 <%= render 'new_dialog', user_options: @user_options %>
 
 <div class="grid" style="min-height: 85vh">
