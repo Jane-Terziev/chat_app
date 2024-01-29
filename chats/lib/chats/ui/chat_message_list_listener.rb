@@ -11,14 +11,15 @@ module Chats
 
       def broadcast_MessageSentEvent(event)
         user_ids = event.chat_participant_user_ids - [event.current_user_id]
-        message_list_view_repository.where(id: event.message_id, user_id: user_ids).each do |message|
+        message = message_list_view_repository.find(event.message_id)
+        user_ids.each do |user_id|
           Turbo::StreamsChannel.broadcast_append_to(
-            [event.chat_id, message.user_id],
+            [event.chat_id, user_id],
             target: 'messageContainer',
             partial: 'chats/ui/messages/message_list_item',
             locals: {
               message: ::DryObjectMapper::Mapper.call(message, ::Chats::App::MessageDto),
-              user_id: event.current_user_id,
+              user_id: user_id,
               should_scroll: true,
               acknowledge: true
             }
