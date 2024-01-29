@@ -1,5 +1,5 @@
 <div id="chatParticipantList">
-  <% participants.each do |participant| %>
+  <% participants.filter{ |it| it.status != 'removed' }.each do |participant| %>
     <%= render 'chats/ui/participants/participant_list_item', chat_id: chat_id, participant: participant %>
   <% end %>
 </div>

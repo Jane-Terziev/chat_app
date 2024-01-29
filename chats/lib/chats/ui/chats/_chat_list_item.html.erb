@@ -21,6 +21,8 @@
     <p class="no-margin cut-text">
       <% if chat.last_message.present? %>
         <%= chat.last_message %>
+      <% elsif chat.total_messages_count > 0 %>
+        Attachment Sent.
       <% else %>
         No messages.
       <% end %>

@@ -8,12 +8,18 @@ module Chats
       has_many :messages, autosave: true, dependent: :destroy
       has_many :unacknowledged_messages, through: :messages
 
+      STATUS = Types::String.enum('active', 'removed')
+
       def first_name
         user.first_name
       end
 
       def last_name
         user.last_name
+      end
+
+      def is_removed?
+        self.status == STATUS['removed']
       end
     end
   end

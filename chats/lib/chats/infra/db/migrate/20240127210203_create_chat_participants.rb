@@ -6,6 +6,8 @@ class CreateChatParticipants < ActiveRecord::Migration[7.1]
       t.string :user_id
       t.string :chat_id
 
+      t.string :status
+
       t.timestamps
     end
 

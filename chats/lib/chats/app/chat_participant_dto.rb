@@ -6,6 +6,7 @@ module Chats
       attribute :chat_id, Types::String
       attribute :first_name, Types::String
       attribute :last_name, Types::String
+      attribute :status, ::Chats::Domain::ChatParticipant::STATUS
     end
   end
 end

@@ -5,6 +5,7 @@ module Chats
       attribute :name, Types::String
       attribute :last_message, Types::String
       attribute :unread_messages_count, Types::Integer
+      attribute :total_messages_count, Types::Integer
       attribute :last_message_timestamp, Types::DateTime
 
       def has_unread_messages?

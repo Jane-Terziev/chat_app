@@ -155,6 +155,7 @@ module Chats
           page: query.page
         )
 
+        # Active Storage does not work well with adding attachment to model with different name
         attachment_file_dtos = ::ActiveStorage::Attachment.includes(:blob).where(
           record_type: 'Chats::Domain::Message',
           record_id: paginated_data.map(&:id)

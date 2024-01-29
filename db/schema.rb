@@ -45,6 +45,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_29_080931) do
   create_table "chat_participants", id: { type: :string, limit: 36 }, force: :cascade do |t|
     t.string "user_id"
     t.string "chat_id"
+    t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["chat_id"], name: "index_chat_participants_on_chat_id"
@@ -113,10 +114,15 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_29_080931) do
       last_message.message AS last_message,
       last_message.created_at AS last_message_timestamp,
       COALESCE(um.unread_messages_count, (0)::bigint) AS unread_messages_count,
+      COALESCE(total_messages.total_messages_count, (0)::bigint) AS total_messages_count,
       c.created_at,
       c.updated_at
-     FROM (((chats c
+     FROM ((((chats c
        JOIN chat_participants cp ON (((c.id)::text = (cp.chat_id)::text)))
+       LEFT JOIN ( SELECT messages.chat_id,
+              count(*) AS total_messages_count
+             FROM messages
+            GROUP BY messages.chat_id) total_messages ON (((total_messages.chat_id)::text = (c.id)::text)))
        LEFT JOIN ( SELECT messages.chat_id,
               messages.message,
               messages.created_at

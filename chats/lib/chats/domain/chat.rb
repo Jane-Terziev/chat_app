@@ -113,7 +113,14 @@ module Chats
 
       def add_chat_participants(user_ids:)
         user_ids.each do |user_id|
-          chat_participants << ChatParticipant.new(id: SecureRandom.uuid, user_id: user_id)
+          existing_participant = chat_participants.find { |it| it.user_id == user_id }
+
+          if existing_participant.present?
+            existing_participant.status = ChatParticipant::STATUS['active'] if existing_participant.is_removed?
+          else
+            chat_participants << ChatParticipant.new(id: SecureRandom.uuid, user_id: user_id)
+          end
+
           apply_event(ChatParticipantAddedEvent.new(data: { chat_id: self.id, chat_participant_user_id: user_id }))
         end
 
@@ -121,6 +128,12 @@ module Chats
       end
 
       def remove_chat_participant(user_id:)
+        chat_participant = chat_participants.find { |it| it.user_id == user_id }
+
+        raise ActiveRecord::RecordNotFound.new unless chat_participant.present?
+
+        chat_participant.status = ChatParticipant::STATUS['removed']
+
         apply_event(
           ChatParticipantRemovedEvent.new(
             data: {
