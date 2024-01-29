@@ -1,0 +1,15 @@
+<%= turbo_stream.append 'chatImagesContainer' do %>
+  <% @paginated_result.data.each do |file_dto|  %>
+    <%= render 'image', file_dto: file_dto %>
+  <% end %>
+<% end %>
+
+<%= turbo_stream.replace 'image_pagination' do %>
+  <% if @paginated_result.pagination.next.present? %>
+    <%= turbo_frame_tag 'image_pagination',
+                        loading: :lazy,
+                        src: chat_images_path(format: :turbo_stream, page: @paginated_result.pagination.next),
+                        autoscroll: false
+    %>
+  <% end %>
+<% end %>

@@ -1,7 +1,8 @@
 <%= turbo_frame_tag 'chat_messages' do %>
   <div id="chatMessageContainer">
-    <div data-controller="drawer" data-drawer-element-id-value="chatSettingsDrawer">
+    <div>
       <%= render 'settings_drawer', chat: paginated_result.data %>
+      <%= render 'chats/ui/chat_images/images_drawer' %>
       <%= render 'chats/ui/participants/participants_dialog', chat_id: paginated_result.data.id %>
       <div class="row" id="<%= paginated_result.data.id %>">
         <div class="max">
@@ -10,7 +11,7 @@
             <%= paginated_result.data.name %>
           </p>
         </div>
-        <i style="cursor:pointer;" data-action="click->drawer#toggle">more_horiz</i>
+        <i style="cursor:pointer;" onclick="document.getElementById('chatSettingsDrawer').show()">more_horiz</i>
       </div>
       <div class="large-divider"></div>
     </div>

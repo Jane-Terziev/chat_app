@@ -74,6 +74,31 @@ module Chats
           )
         end
 
+        def get_images_from_chat(query)
+          pagy_metadata, paginated_data = pagy_countless(
+            message_list_view_repository.where(chat_id: query.chat_id, message: [nil, '']).order('created_at DESC'),
+            items: query.page_size,
+            page: query.page
+          )
+
+          images_dto = ActiveStorage::Attachment.includes(:blob).where(
+            record_type: 'Chats::Domain::Message',
+            record_id: paginated_data.map(&:id)
+          ).map do |attachment_file|
+            ::Chats::Domain::FileDto.new(
+              message_id: attachment_file.record_id,
+              url: attachment_file.url,
+              content_type: attachment_file.content_type,
+              filename: attachment_file.filename.to_s
+            )
+          end
+
+          PaginationDto.new(
+            data: images_dto.reverse,
+            pagination: pagy_metadata
+          )
+        end
+
         def get_active_chat_participants(chat_id)
           map_into(chat_participant_view_repository.where(chat_id: chat_id, status: 'active'), ChatParticipantDto)
         end

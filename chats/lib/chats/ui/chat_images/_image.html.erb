@@ -1,0 +1,15 @@
+<div class="s12" style="height: 120px">
+  <div class="max center-align">
+    <progress class="circle large"></progress>
+    <%= image_tag(
+          file_dto.url,
+          id: "#{file_dto.message_id}Image",
+          style: 'width: 100%; height: 120px; cursor: pointer; display: none;',
+          "data-controller": 'image-preview',
+          "data-image-preview-image-url-value": file_dto.url,
+          "data-action": "click->image-preview#preview",
+          onload: "javascript: this.parentElement.querySelector('progress').remove(); this.style.display = 'initial'"
+        )
+    %>
+  </div>
+</div>

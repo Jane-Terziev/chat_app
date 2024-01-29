@@ -1,7 +1,7 @@
 <dialog class="right" id="chatSettingsDrawer" style="max-width: 20%">
   <header>
     <nav style="gap: 0.25rem">
-      <button class="transparent circle large" data-action="click->drawer#toggle">
+      <button class="transparent circle large" onclick="document.getElementById('chatSettingsDrawer').close();">
         <i>close</i>
       </button>
       <h6 class="max no-margin cut-text"><%= chat.name %></h6>
@@ -24,7 +24,7 @@
                         format: :turbo_stream do %>
     <% end %>
 
-    <div class="row wave round medium-padding" onclick="document.getElementById('addChatParticipantDialog').show()">
+    <div class="row wave round medium-padding" onclick="document.getElementById('chatSettingsDrawer').close(); document.getElementById('addChatParticipantDialog').show()">
       <i>person_add</i>
       Add People
     </div>
@@ -42,7 +42,7 @@
 
     <div class="row round small-padding no-margin">
       <div class="max">
-        <a>
+        <a onclick="document.getElementById('chatSettingsDrawer').close(); document.getElementById('chatImagesDrawer').show();">
           <i class="small-padding">image</i>
           Images
         </a>

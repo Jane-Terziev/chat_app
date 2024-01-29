@@ -1,12 +1,13 @@
-<dialog id="addChatParticipantDialog" class="modal surface">
+<dialog id="addChatParticipantDialog" class="right">
   <header>
     <nav style="gap: 0.25rem">
-      <h6 class="max no-margin cut-text">Add People to Chat</h6>
-      <button class="transparent circle large" onclick="document.getElementById('addChatParticipantDialog').close()">
+      <button class="transparent circle large" onclick="document.getElementById('addChatParticipantDialog').close(); document.getElementById('chatSettingsDrawer').show()">
         <i>close</i>
       </button>
+      <h6 class="max no-margin cut-text">Add People to Chat</h6>
     </nav>
   </header>
+
   <div class="large-divider"></div>
 
   <%= turbo_frame_tag 'participant_form', loading: :lazy, src: new_chat_participant_path(chat_id: params[:chat_id]) %>

@@ -13,6 +13,7 @@ module Chats
           return nil unless attachment.present?
           ActiveStorage::Current.url_options = { host: 'localhost:3000' }
           FileDto.new(
+            message_id: self.id,
             url: attachment.url,
             content_type: attachment.content_type,
             filename: attachment.filename.to_s
