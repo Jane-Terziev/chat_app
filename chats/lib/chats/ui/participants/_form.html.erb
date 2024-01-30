@@ -8,7 +8,7 @@
                    "data-slim-select-selector-value": '#add_participant_user_ids',
                    "data-slim-select-placeholder-text-value": 'Select Users'
     %>
-    <span style="font-weight: bolder; color: var(--error);inset-inline-start: 1.5rem; font-size: .75rem">
+    <span class="selectError" style="font-weight: bolder; color: var(--error);inset-inline-start: 1.5rem; font-size: .75rem">
         <% if show_error(form, :user_ids) %>
           Select at least one user
         <% end %>
