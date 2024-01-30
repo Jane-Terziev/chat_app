@@ -53,7 +53,7 @@ module Chats
             locals: { chat: chat_dto, move_to_top: true }
           ),
           turbo_stream.replace('message_form', partial: 'form', locals: { form: SendMessageValidator.new, chat_id: params[:chat_id] }),
-          *append_message_streams
+        *append_message_streams
         ], status: 201
       rescue ConstraintError => e
         render partial: 'form', locals: { form: e.validator, chat_id: params[:chat_id] }, status: 422

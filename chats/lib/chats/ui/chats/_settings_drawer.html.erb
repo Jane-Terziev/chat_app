@@ -1,0 +1,89 @@
+<div id="chatSettings">
+  <%= render 'chats/ui/chat_images/images_drawer' %>
+  <%= render 'chats/ui/chat_files/files_drawer' %>
+  <%= render 'chats/ui/participants/participants_dialog', chat_id: chat_id %>
+  <dialog class="right" id="chatSettingsDrawer" style="max-width: 20%">
+    <header>
+      <nav style="gap: 0.25rem">
+        <button class="transparent circle large" onclick="document.getElementById('chatSettingsDrawer').close();">
+          <i>close</i>
+        </button>
+        <h6 class="max no-margin cut-text">Chat Settings</h6>
+      </nav>
+    </header>
+    <div class="large-divider"></div>
+    <details class="small-margin">
+      <summary class="none">
+        <article class="round no-elevate">
+          <nav>
+            <div class="max">Chat Members</div>
+            <i>chevron_right</i>
+          </nav>
+        </article>
+      </summary>
+
+      <%= turbo_frame_tag 'participants_list',
+                          loading: :lazy,
+                          src: chat_participants_path(chat_id: chat_id),
+                          format: :turbo_stream do %>
+      <% end %>
+
+      <div class="row wave round medium-padding" onclick="document.getElementById('chatSettingsDrawer').close(); document.getElementById('addChatParticipantDialog').show()">
+        <i>person_add</i>
+        Add People
+      </div>
+    </details>
+
+    <details class="small-margin">
+      <summary class="none">
+        <article class="round no-elevate">
+          <nav>
+            <div class="max">Media</div>
+            <i>chevron_right</i>
+          </nav>
+        </article>
+      </summary>
+
+      <%= link_to chat_images_path(chat_id: chat_id),
+                  class: 'row wave round small-padding',
+                  onclick: "document.getElementById('chatSettingsDrawer').close(); document.getElementById('chatImagesDrawer').show();",
+                  "data-turbo-frame": "chat_images" do %>
+        <i class="small-padding">image</i>
+        Images
+      <% end %>
+
+      <%= link_to chat_files_path(chat_id: chat_id),
+                  class: 'row wave round small-padding',
+                  onclick: "document.getElementById('chatSettingsDrawer').close(); document.getElementById('chatFilesDrawer').show();",
+                  "data-turbo-frame": "chat_files" do %>
+        <i class="small-padding">folder_open</i>
+        Files
+      <% end %>
+    </details>
+
+    <details class="small-margin">
+      <summary class="none">
+        <article class="round no-elevate">
+          <nav>
+            <div class="max">Settings</div>
+            <i>chevron_right</i>
+          </nav>
+        </article>
+      </summary>
+
+      <%= link_to chat_path(id: chat_id),
+                  data: { "turbo-method": :delete, "turbo-frame": '_top' },
+                  class: "row wave round small-padding no-margin" do %>
+        <i class="small-margin">delete</i>
+        Delete Chat
+      <% end %>
+
+      <%= link_to chat_leave_chat_path(chat_id: chat_id),
+                  data: { "turbo-method": :delete },
+                  class: 'row wave round small-padding no-margin' do %>
+        <i class="small-margin">logout</i>
+        Leave Chat
+      <% end %>
+    </details>
+  </dialog>
+</div>

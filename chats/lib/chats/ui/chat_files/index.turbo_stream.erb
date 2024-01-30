@@ -1,0 +1,15 @@
+<%= turbo_stream.append 'chatFilesContainer' do %>
+  <% @paginated_result.data.each do |file_dto|  %>
+    <%= render 'file', file_dto: file_dto %>
+  <% end %>
+<% end %>
+
+<%= turbo_stream.replace 'file_pagination' do %>
+  <% if @paginated_result.pagination.next.present? %>
+    <%= turbo_frame_tag 'file_pagination',
+                        loading: :lazy,
+                        src: chat_files_path(format: :turbo_stream, page: @paginated_result.pagination.next),
+                        autoscroll: false
+    %>
+  <% end %>
+<% end %>

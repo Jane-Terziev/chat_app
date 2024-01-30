@@ -50,7 +50,8 @@ module Chats
             unacknowledged_messages: chat_participants.filter { |it| it.user_id != user_id }.map do |participant|
               UnacknowledgedMessage.new(user_id: participant.user_id, chat_id: self.id)
             end,
-            chat_id: self.id
+            chat_id: self.id,
+            message_type: Message::MESSAGE_TYPES['message']
           )
 
           chat_participant.messages << chat_message
@@ -76,8 +77,11 @@ module Chats
                 UnacknowledgedMessage.new(user_id: participant.user_id, chat_id: self.id)
               end,
               attachment: attachment,
-              chat_id: self.id
+              chat_id: self.id,
             )
+
+            attachment.content_type == 'application/pdf' ? chat_message.message_type = Message::MESSAGE_TYPES['file'] :
+              chat_message.message_type = Message::MESSAGE_TYPES['image']
 
             chat_participant.messages << chat_message
 

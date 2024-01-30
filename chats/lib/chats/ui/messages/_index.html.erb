@@ -1,9 +1,7 @@
 <%= turbo_frame_tag 'chat_messages' do %>
   <div id="chatMessageContainer">
     <div>
-      <%= render 'settings_drawer', chat: paginated_result.data %>
-      <%= render 'chats/ui/chat_images/images_drawer' %>
-      <%= render 'chats/ui/participants/participants_dialog', chat_id: paginated_result.data.id %>
+      <%= render 'chats/ui/chats/settings_drawer', chat_id: paginated_result.data.id %>
       <div class="row" id="<%= paginated_result.data.id %>">
         <div class="max">
           <h6 class="cut-text"><%= paginated_result.data.name %></h6>

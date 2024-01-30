@@ -7,6 +7,8 @@ module Chats
       belongs_to :chat_participant
       has_many :unacknowledged_messages, dependent: :delete_all
 
+      MESSAGE_TYPES = Types::String.enum('message', 'image', 'file')
+
       def attachment_file
         return nil unless attachment.attached?
         ActiveStorage::Current.url_options = { host: 'localhost:3000' }

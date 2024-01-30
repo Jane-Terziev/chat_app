@@ -35,7 +35,7 @@ module Chats
           )
         ], status: 201
       rescue ConstraintError => e
-        participants = chat_service.get_active_chat_participants(params[:chat_id])
+        participants = chat_read_service.get_participants_select_options_for_chat(params[:chat_id])
         render :new, locals: { form: e.validator, chat_id: params[:chat_id], participants: participants }, status: 422
       end
 

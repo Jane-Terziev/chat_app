@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_01_29_172508) do
+ActiveRecord::Schema[7.1].define(version: 2024_01_30_095311) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -66,6 +66,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_29_172508) do
     t.string "chat_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "message_type"
     t.index ["chat_id"], name: "index_messages_on_chat_id"
     t.index ["chat_participant_id"], name: "index_messages_on_chat_participant_id"
   end
@@ -137,15 +138,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_29_172508) do
              FROM unacknowledged_messages
             GROUP BY unacknowledged_messages.chat_id, unacknowledged_messages.user_id) um ON ((((c.id)::text = (um.chat_id)::text) AND ((cp.user_id)::text = (um.user_id)::text))));
   SQL
-  create_view "message_list_views", sql_definition: <<-SQL
-      SELECT m.id,
-      m.chat_id,
-      m.message,
-      cp.user_id,
-      m.created_at
-     FROM (messages m
-       JOIN chat_participants cp ON (((m.chat_participant_id)::text = (cp.id)::text)));
-  SQL
   create_view "chat_participant_views", sql_definition: <<-SQL
       SELECT cp.id,
       cp.user_id,
@@ -155,5 +147,15 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_29_172508) do
       u.last_name
      FROM (chat_participants cp
        JOIN users u ON (((cp.user_id)::text = (u.id)::text)));
+  SQL
+  create_view "message_list_views", sql_definition: <<-SQL
+      SELECT m.id,
+      m.chat_id,
+      m.message,
+      cp.user_id,
+      m.message_type,
+      m.created_at
+     FROM (messages m
+       JOIN chat_participants cp ON (((m.chat_participant_id)::text = (cp.id)::text)));
   SQL
 end

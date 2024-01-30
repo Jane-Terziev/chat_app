@@ -76,7 +76,7 @@ module Chats
 
         def get_images_from_chat(query)
           pagy_metadata, paginated_data = pagy_countless(
-            message_list_view_repository.where(chat_id: query.chat_id, message: [nil, '']).order('created_at DESC'),
+            message_list_view_repository.where(chat_id: query.chat_id, message_type: 'image').order('created_at DESC'),
             items: query.page_size,
             page: query.page
           )
@@ -95,6 +95,31 @@ module Chats
 
           PaginationDto.new(
             data: images_dto.reverse,
+            pagination: pagy_metadata
+          )
+        end
+
+        def get_files_from_chat(query)
+          pagy_metadata, paginated_data = pagy_countless(
+            message_list_view_repository.where(chat_id: query.chat_id, message_type: 'file').order('created_at DESC'),
+            items: query.page_size,
+            page: query.page
+          )
+
+          files_dto = ActiveStorage::Attachment.includes(:blob).where(
+            record_type: 'Chats::Domain::Message',
+            record_id: paginated_data.map(&:id)
+          ).map do |attachment_file|
+            ::Chats::Domain::FileDto.new(
+              message_id: attachment_file.record_id,
+              url: attachment_file.url,
+              content_type: attachment_file.content_type,
+              filename: attachment_file.filename.to_s
+            )
+          end
+
+          PaginationDto.new(
+            data: files_dto.reverse,
             pagination: pagy_metadata
           )
         end
