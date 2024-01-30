@@ -29,6 +29,7 @@ Dry::System.register_provider_source(:chats, group: :chats) do
     ])
 
     event_publisher.subscribe(Chats::Ui::ChatParticipantListListener, to: [
+      Chats::Domain::Chat::ChatParticipantAddedEvent,
       Chats::Domain::Chat::ChatParticipantRemovedEvent
     ])
 

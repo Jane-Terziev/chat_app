@@ -125,7 +125,15 @@ module Chats
             chat_participants << ChatParticipant.create_new(user_id: user_id)
           end
 
-          apply_event(ChatParticipantAddedEvent.new(data: { chat_id: self.id, chat_participant_user_id: user_id }))
+          apply_event(
+            ChatParticipantAddedEvent.new(
+              data: {
+                chat_id: self.id,
+                chat_participant_user_id: user_id,
+                chat_participant_user_ids: chat_participants.map(&:user_id)
+              }
+            )
+          )
         end
 
         self

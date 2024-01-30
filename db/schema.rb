@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_01_30_095311) do
+ActiveRecord::Schema[7.1].define(version: 2024_01_30_115714) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -108,6 +108,26 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_30_095311) do
   add_foreign_key "unacknowledged_messages", "messages"
   add_foreign_key "unacknowledged_messages", "users"
 
+  create_view "chat_participant_views", sql_definition: <<-SQL
+      SELECT cp.id,
+      cp.user_id,
+      cp.chat_id,
+      cp.status,
+      u.first_name,
+      u.last_name
+     FROM (chat_participants cp
+       JOIN users u ON (((cp.user_id)::text = (u.id)::text)));
+  SQL
+  create_view "message_list_views", sql_definition: <<-SQL
+      SELECT m.id,
+      m.chat_id,
+      m.message,
+      cp.user_id,
+      m.message_type,
+      m.created_at
+     FROM (messages m
+       JOIN chat_participants cp ON (((m.chat_participant_id)::text = (cp.id)::text)));
+  SQL
   create_view "chat_list_views", sql_definition: <<-SQL
       SELECT c.id,
       c.name,
@@ -136,26 +156,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_30_095311) do
               unacknowledged_messages.user_id,
               count(*) AS unread_messages_count
              FROM unacknowledged_messages
-            GROUP BY unacknowledged_messages.chat_id, unacknowledged_messages.user_id) um ON ((((c.id)::text = (um.chat_id)::text) AND ((cp.user_id)::text = (um.user_id)::text))));
-  SQL
-  create_view "chat_participant_views", sql_definition: <<-SQL
-      SELECT cp.id,
-      cp.user_id,
-      cp.chat_id,
-      cp.status,
-      u.first_name,
-      u.last_name
-     FROM (chat_participants cp
-       JOIN users u ON (((cp.user_id)::text = (u.id)::text)));
-  SQL
-  create_view "message_list_views", sql_definition: <<-SQL
-      SELECT m.id,
-      m.chat_id,
-      m.message,
-      cp.user_id,
-      m.message_type,
-      m.created_at
-     FROM (messages m
-       JOIN chat_participants cp ON (((m.chat_participant_id)::text = (cp.id)::text)));
+            GROUP BY unacknowledged_messages.chat_id, unacknowledged_messages.user_id) um ON ((((c.id)::text = (um.chat_id)::text) AND ((cp.user_id)::text = (um.user_id)::text))))
+    WHERE ((cp.status)::text = 'active'::text);
   SQL
 end

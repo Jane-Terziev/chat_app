@@ -26,7 +26,7 @@ module Chats
           turbo_stream.replace(
             'chatParticipantList',
             partial: 'participant_list',
-            locals: { participants: chat_participants_dto, chat_id: params[:chat_id] }
+            locals: { participants: chat_participants_dto, chat_id: params[:chat_id], user_id: current_user.id }
           ),
           turbo_stream.replace(
             'addChatParticipantDialog',
