@@ -21,6 +21,7 @@
 
 
 <body data-controller='theme'>
+  <%= render 'shared/flash' %>
 <% if current_user %>
   <%= turbo_stream_from current_user.id %>
 
@@ -28,7 +29,6 @@
   <%= render 'shared/sidebar', dialog: false, id: 'sidebar' %>
   <%= render 'shared/navigation_drawer' %>
   <%= render 'shared/bottom_navigation' %>
-  <%= render 'shared/flash' %>
   <main class='responsive max'>
     <%= render 'shared/navbar' %>
     <div class="medium-margin">

@@ -1,0 +1,38 @@
+<%= form_tag(user_registration_path, "data-controller": 'form', id: 'registrationForm', "data-turbo": false) do %>
+  <div class="field label round border <%= invalid?(form, :first_name) %>" style="margin-bottom: 0.5rem;">
+    <%= text_field_tag 'registration[first_name]', form.params.dig(:first_name) %>
+    <%= label_tag 'registration[first_name]', 'First Name' %>
+  </div>
+  <div class="left-align" style="margin-left: 0.5rem; color: var(--error)"><%= show_error(form, :first_name) %></div>
+
+  <div class="field label round border <%= invalid?(form, :last_name) %>" style="margin-bottom: 0.5rem;">
+    <%= text_field_tag 'registration[last_name]', form.params.dig(:last_name) %>
+    <%= label_tag 'registration[last_name]', 'Last Name' %>
+  </div>
+  <div class="left-align" style="margin-left: 0.5rem; color: var(--error)"><%= show_error(form, :last_name) %></div>
+
+
+  <div class="field label round border <%= invalid?(form, :email) %>" style="margin-bottom: 0.5rem;">
+    <%= email_field_tag 'registration[email]', form.params.dig(:email) %>
+    <%= label_tag 'registration[email]', 'Email' %>
+  </div>
+  <div class="left-align" style="margin-left: 0.5rem; color: var(--error)"><%= show_error(form, :email) %></div>
+
+
+  <div class="field label round border <%= invalid?(form, :password) %>" style="margin-bottom: 0.5rem;">
+    <%= password_field_tag 'registration[password]', form.params.dig(:password) %>
+    <%= label_tag 'registration[password]', 'Password' %>
+  </div>
+  <div class="left-align" style="margin-left: 0.5rem; color: var(--error)"><%= show_error(form, :password) %></div>
+
+  <div class="field label round border <%= invalid?(form, :password_confirmation) %>" style="margin-bottom: 0.5rem;">
+    <%= password_field_tag 'registration[password_confirmation]', form.params.dig(:password_confirmation) %>
+    <%= label_tag 'registration[password_confirmation]', 'Password Confirmation' %>
+  </div>
+  <div class="left-align" style="margin-left: 0.5rem; color: var(--error)"><%= show_error(form, :password_confirmation) %></div>
+
+  <div style="margin-top: 2.5rem !important; text-wrap: nowrap">
+    <%= button_tag 'Sign Up' %>
+    <%= link_to 'Back', new_user_session_path, class: 'button border', "data-turbo-frame": '_top' %>
+  </div>
+<% end %>

@@ -19,8 +19,8 @@ class ApplicationContract < Dry::Validation::Contract
   end
 
   register_macro(:password_format) do
-    unless /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/i.match?(value)
-      key.failure('must contain 1 lower case letter, 1 upper case letter, 1 number, 1 special character and have a minimum length of 8')
+    unless /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])[A-Za-z0-9]{6,}$/.match?(value)
+      key.failure('must contain 1 lower case letter, 1 upper case letter, 1 number and have a minimum length of 6')
     end
   end
 
