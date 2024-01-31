@@ -14,15 +14,17 @@
             </span>
         </p>
       <% else %>
-        <div class="border round medium-padding">
-          <p>
-            <%= Rinku.auto_link(message.message, :all, 'target="_blank"').html_safe %>
-          </p>
-          <p class="tooltip no-space bottom"
-             data-controller="chat-date-formatter"
-             data-chat-date-formatter-timestamp-value="<%= message.created_at.as_json %>"
-          >
-          </p>
+        <div class="max">
+          <div class="border round medium-padding" style="display: inline-block">
+            <p>
+              <%= Rinku.auto_link(message.message, :all, 'target="_blank"').html_safe %>
+            </p>
+            <p class="tooltip no-space bottom"
+               data-controller="chat-date-formatter"
+               data-chat-date-formatter-timestamp-value="<%= message.created_at.as_json %>"
+            >
+            </p>
+          </div>
         </div>
       <% end %>
     </div>

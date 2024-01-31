@@ -76,7 +76,7 @@ body.light {
   --surface-container-highest:#e2e2e6;
 }
 
-@media(max-width: 575.98px) {
+@media(max-width: 600px) {
   #bottom-navigation {
     display: flex;
   }
@@ -100,7 +100,7 @@ body.light {
   }
 }
 
-@media(min-width: 575.98px) {
+@media(min-width: 601px) {
   #hamburgerMenu {
     display: none;
   }

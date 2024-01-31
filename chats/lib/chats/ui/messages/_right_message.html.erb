@@ -17,20 +17,22 @@
                 data-controller="chat-date-formatter"
                 data-chat-date-formatter-timestamp-value="<%= message.created_at.as_json %>"
           >
-            </span>
+          </span>
         </p>
       <% else %>
-        <div class="border round surface-bright medium-padding"
-             style="background-color: #218aff !important; color: white !important;"
-        >
-          <p>
-            <%= Rinku.auto_link(message.message, :all, 'target="_blank"').html_safe %>
-          </p>
-          <p class="tooltip no-space bottom"
-             data-controller="chat-date-formatter"
-             data-chat-date-formatter-timestamp-value="<%= message.created_at.as_json %>"
+        <div class="max right-align">
+          <div class="border round surface-bright medium-padding left-align"
+               style="background-color: #218aff !important; color: white !important; display: inline-block"
           >
-          </p>
+            <p>
+              <%= Rinku.auto_link(message.message, :all, 'target="_blank"').html_safe %>
+            </p>
+            <p class="tooltip no-space bottom"
+               data-controller="chat-date-formatter"
+               data-chat-date-formatter-timestamp-value="<%= message.created_at.as_json %>"
+            >
+            </p>
+          </div>
         </div>
       <% end %>
       <%= image_tag 'profile.jpeg', class: 'circle small' %>
