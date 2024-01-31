@@ -6,14 +6,6 @@ module Chats
       has_many :chat_participants, autosave: true, dependent: :destroy
       has_many :unacknowledged_messages, autosave: true, dependent: :delete_all
 
-      def self.ransackable_attributes(auth_object = nil)
-        %w[name]
-      end
-
-      def self.ransackable_associations(auth_object = nil)
-        ["chat_participants"]
-      end
-
       def self.create_new(id: SecureRandom.uuid, name:, user_ids:, user_id:)
         chat = new(
           id: id,

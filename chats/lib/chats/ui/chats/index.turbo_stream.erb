@@ -6,6 +6,11 @@
 
 <%= turbo_stream.replace 'pagination' do %>
   <% if @paginated_result.pagination.next.present? %>
-    <%= turbo_frame_tag 'pagination', loading: :lazy, src: chats_path(format: :turbo_stream, page: @paginated_result.pagination.next) %>
+    <%= turbo_frame_tag 'pagination', loading: :lazy, src: chats_path(
+      format: :turbo_stream,
+      page: @paginated_result.pagination.next,
+      q: params[:q].as_json
+    )
+    %>
   <% end %>
 <% end %>

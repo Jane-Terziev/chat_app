@@ -4,5 +4,5 @@
       <%= render 'chat_list_item', chat: chat, move_to_top: false %>
     <% end %>
   </div>
-  <%= turbo_frame_tag 'pagination', loading: :lazy, src: chats_path(format: :turbo_stream) %>
+  <%= turbo_frame_tag 'pagination', loading: :lazy, src: chats_path(format: :turbo_stream, q: params[:q].as_json) %>
 </div>

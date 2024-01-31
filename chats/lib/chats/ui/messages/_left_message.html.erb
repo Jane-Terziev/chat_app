@@ -1,7 +1,7 @@
-<div class="s12 m12 l6">
-  <% if message.message.present? %>
-    <div class="row round messageRow">
-      <%= image_tag 'profile.jpeg', class: 'circle small' %>
+<div class="s12 m12 l12 left-align">
+  <div class="round messageRow" style="display: inline-flex; align-items: center">
+    <%= image_tag 'profile.jpeg', class: 'circle small', style: 'margin-right: 0.5rem;' %>
+    <% if message.message.present? %>
       <% if message.is_an_emoji? %>
        <div class="max">
          <p>
@@ -29,13 +29,10 @@
           </div>
         </div>
       <% end %>
-    </div>
   <% else %>
-    <div class="row messageRow">
-      <%= image_tag 'profile.jpeg', class: 'circle small' %>
       <% if message.attachment_file.present? %>
         <% if message.attachment_file.content_type.include?('image') %>
-          <div class="max" style="height: 200px;">
+          <div class="max left-align" style="height: 200px;">
             <progress class="circle large"></progress>
             <%= image_tag(
                   message.attachment_file.url,
@@ -63,6 +60,6 @@
           </a>
         <% end %>
       <% end %>
-    </div>
   <% end %>
+  </div>
 </div>
