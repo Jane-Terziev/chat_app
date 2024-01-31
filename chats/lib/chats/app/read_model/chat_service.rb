@@ -6,7 +6,8 @@ module Chats
                   current_user_repository: 'current_user_repository',
                   chat_list_view_repository: 'chats.chat_list_view_repository',
                   message_list_view_repository: 'chats.message_list_view_repository',
-                  chat_participant_view_repository: 'chats.chat_participant_view_repository'
+                  chat_participant_view_repository: 'chats.chat_participant_view_repository',
+                  user_repository: 'chats.user_repository'
                 ]
 
         def get_all_chats(query)
@@ -130,14 +131,16 @@ module Chats
 
         def get_participants_select_options_for_new_chat
           map_into(
-            User.where.not(id: current_user_repository.authenticated_identity.id),
+            user_repository.where.not(id: current_user_repository.authenticated_identity.id),
             ChatParticipantSelectDto
           )
         end
 
         def get_participants_select_options_for_chat(chat_id)
           map_into(
-            User.all.where.not(id: Chats::Domain::ChatParticipant.where(chat_id: chat_id, status: 'active').map(&:user_id)),
+            user_repository.all.where.not(
+              id: chat_participant_view_repository.where(chat_id: chat_id, status: 'active').map(&:user_id)
+            ),
             ChatParticipantSelectDto
           )
         end
