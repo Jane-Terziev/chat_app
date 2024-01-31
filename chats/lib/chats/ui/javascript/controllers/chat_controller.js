@@ -13,8 +13,13 @@ export default class extends Controller {
                 let target = eventData.srcElement.target;
                 if(target === 'message_pagination') {
                     let container = document.getElementById('messageContainer');
-                    if(container.children[10]) {
-                        container.parentElement.scrollTop = container.children[10].offsetTop;
+                    let childrenSize = container.children.length;
+                    let scrollPosition = 10;
+                    if((childrenSize % 10) !== 0) {
+                        scrollPosition = childrenSize % 10;
+                    }
+                    if(container.children[scrollPosition]) {
+                        container.parentElement.scrollTop = container.children[scrollPosition].offsetTop;
                     }
                 }
             }
