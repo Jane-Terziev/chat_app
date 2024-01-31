@@ -1,27 +1,25 @@
 <div class="s12 m12 l6"></div>
-<div class="s12 m12 l6">
-  <% if message.message.present? %>
-    <div class="row round messageRow max right-align">
-      <button class="circle messageOptions">
-        <i>more_vert</i>
-        <menu class="right no-wrap">
-          <%= link_to 'Remove', chat_message_path(id: message.id, chat_id: message.chat_id), data: { "turbo-method": :delete } %>
-        </menu>
-      </button>
-      <% if message.is_an_emoji? %>
-        <p>
-            <span style="font-size: 3rem">
-              <%= Rinku.auto_link(message.message, :all, 'target="_blank"').html_safe %>
-            </span>
-          <span class="tooltip no-space bottom"
-                data-controller="chat-date-formatter"
-                data-chat-date-formatter-timestamp-value="<%= message.created_at.as_json %>"
+<div class="s12 m12 l6 right-align">
+  <div class="round messageRow max" style="display: inline-flex; align-items: center">
+    <button class="circle messageOptions">
+      <i>more_vert</i>
+      <menu class="right no-wrap">
+        <%= link_to 'Remove', chat_message_path(id: message.id, chat_id: message.chat_id), data: { "turbo-method": :delete } %>
+      </menu>
+    </button>
+    <% if message.message.present? %>
+      <div class="max left-align">
+        <% if message.is_an_emoji? %>
+          <p style="font-size: 3rem;">
+            <%= Rinku.auto_link(message.message, :all, 'target="_blank"').html_safe %>
+          </p>
+          <p class="tooltip no-space bottom"
+             data-controller="chat-date-formatter"
+             data-chat-date-formatter-timestamp-value="<%= message.created_at.as_json %>"
           >
-          </span>
-        </p>
-      <% else %>
-        <div class="max right-align">
-          <div class="border round surface-bright medium-padding left-align"
+          </p>
+        <% else %>
+          <div class="border round surface-bright medium-padding"
                style="background-color: #218aff !important; color: white !important; display: inline-block"
           >
             <p>
@@ -33,21 +31,12 @@
             >
             </p>
           </div>
-        </div>
-      <% end %>
-      <%= image_tag 'profile.jpeg', class: 'circle small' %>
-    </div>
-  <% else %>
-    <div class="row messageRow max right-align">
-      <button class="circle messageOptions">
-        <i>more_vert</i>
-        <menu class="right no-wrap">
-          <%= link_to 'Remove', chat_message_path(id: message.id, chat_id: message.chat_id), data: { "turbo-method": :delete } %>
-        </menu>
-      </button>
+        <% end %>
+      </div>
+    <% else %>
       <% if message.attachment_file.present? %>
         <% if message.attachment_file.content_type.include?('image') %>
-          <div style="height: 200px;">
+          <div class="max" style="height: 200px;">
             <progress class="circle large"></progress>
             <%= image_tag(
                   message.attachment_file.url,
@@ -75,7 +64,7 @@
           </a>
         <% end %>
       <% end %>
-      <%= image_tag 'profile.jpeg', class: 'circle small' %>
-    </div>
-  <% end %>
+    <% end %>
+    <%= image_tag 'profile.jpeg', class: 'circle small', style: 'margin-left: 0.75rem;' %>
+  </div>
 </div>

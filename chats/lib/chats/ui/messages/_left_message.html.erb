@@ -3,16 +3,18 @@
     <div class="row round messageRow">
       <%= image_tag 'profile.jpeg', class: 'circle small' %>
       <% if message.is_an_emoji? %>
-        <p>
+       <div class="max">
+         <p>
             <span style="font-size: 3rem">
               <%= Rinku.auto_link(message.message, :all, 'target="_blank"').html_safe %>
             </span>
-          <span class="tooltip no-space bottom"
-                data-controller="chat-date-formatter"
-                data-chat-date-formatter-timestamp-value="<%= message.created_at.as_json %>"
-          >
+           <span class="tooltip no-space bottom"
+                 data-controller="chat-date-formatter"
+                 data-chat-date-formatter-timestamp-value="<%= message.created_at.as_json %>"
+           >
             </span>
-        </p>
+         </p>
+       </div>
       <% else %>
         <div class="max">
           <div class="border round medium-padding" style="display: inline-block">
