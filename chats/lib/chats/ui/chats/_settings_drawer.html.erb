@@ -1,6 +1,7 @@
 <div id="chatSettings">
   <%= render 'chats/ui/chat_images/images_drawer' %>
   <%= render 'chats/ui/chat_files/files_drawer' %>
+  <%= render 'chats/ui/chat_links/links_drawer' %>
   <%= render 'chats/ui/participants/participants_dialog', chat_id: chat_id %>
   <dialog class="right" id="chatSettingsDrawer" style="max-width: 20%">
     <header>
@@ -58,6 +59,14 @@
                   "data-turbo-frame": "chat_files" do %>
         <i class="small-padding">folder_open</i>
         Files
+      <% end %>
+
+      <%= link_to chat_links_path(chat_id: chat_id),
+                  class: 'row wave round small-padding',
+                  onclick: "document.getElementById('chatSettingsDrawer').close(); document.getElementById('chatLinksDrawer').show();",
+                  "data-turbo-frame": "chat_links" do %>
+        <i class="small-padding">link</i>
+        Links
       <% end %>
     </details>
 

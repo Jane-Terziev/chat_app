@@ -1,0 +1,14 @@
+<dialog class="right" id="chatLinksDrawer" style="max-width: 20%">
+  <header>
+    <nav style="gap: 0.25rem">
+      <button class="transparent circle large" onclick="document.getElementById('chatLinksDrawer').close();document.getElementById('chatSettingsDrawer').show();">
+        <i>close</i>
+      </button>
+      <h6 class="max no-margin cut-text">Links</h6>
+    </nav>
+  </header>
+  <div class="large-divider"></div>
+
+  <%= turbo_frame_tag 'chat_links' do %>
+  <% end %>
+</dialog>

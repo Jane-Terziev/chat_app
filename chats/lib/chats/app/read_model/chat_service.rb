@@ -7,7 +7,8 @@ module Chats
                   chat_list_view_repository: 'chats.chat_list_view_repository',
                   message_list_view_repository: 'chats.message_list_view_repository',
                   chat_participant_view_repository: 'chats.chat_participant_view_repository',
-                  user_repository: 'chats.user_repository'
+                  user_repository: 'chats.user_repository',
+                  chat_message_link_repository: 'chats.chat_message_link_repository',
                 ]
 
         def get_all_chats(query)
@@ -121,6 +122,21 @@ module Chats
 
           PaginationDto.new(
             data: files_dto.reverse,
+            pagination: pagy_metadata
+          )
+        end
+
+        def get_links_from_chat(query)
+          pagy_metadata, paginated_data = pagy_countless(
+            chat_message_link_repository.joins(:message)
+                                        .where(message: { chat_id: query.chat_id })
+                                        .order('created_at DESC'),
+            items: query.page_size,
+            page: query.page
+          )
+
+          PaginationDto.new(
+            data: map_into(paginated_data, ChatMessageLinkDto),
             pagination: pagy_metadata
           )
         end

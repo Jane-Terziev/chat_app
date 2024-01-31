@@ -4,6 +4,7 @@ Dry::System.register_provider_source(:chats, group: :chats) do
     register("chats.message_repository") { Chats::Domain::Message }
     register("chats.unacknowledged_message_repository") { Chats::Domain::UnacknowledgedMessage }
     register("chats.user_repository") { Chats::Domain::User }
+    register("chats.chat_message_link_repository") { Chats::Domain::ChatMessageLink }
     register('chats.chat_list_view_repository') { Chats::Domain::ReadModel::ChatListView }
     register('chats.message_list_view_repository') { Chats::Domain::ReadModel::MessageListView }
     register('chats.chat_participant_view_repository') { Chats::Domain::ReadModel::ChatParticipantView }

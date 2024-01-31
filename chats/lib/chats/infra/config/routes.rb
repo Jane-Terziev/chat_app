@@ -7,5 +7,6 @@ Rails.application.routes.draw do
     delete 'leave_chat', to: 'chats/ui/chats#leave_chat', as: 'leave_chat'
     resources :images, controller: "chats/ui/chat_images"
     resources :files, controller: "chats/ui/chat_files"
+    resources :links, controller: "chats/ui/chat_links"
   end
 end

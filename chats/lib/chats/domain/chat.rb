@@ -54,6 +54,11 @@ module Chats
             message_type: Message::MESSAGE_TYPES['message']
           )
 
+          links = message.scan(/https?:\/\/\S+/)
+          links.each do |link|
+            chat_message.chat_message_links << ChatMessageLink.new(id: SecureRandom.uuid, link: link)
+          end
+
           chat_participant.messages << chat_message
 
           new_messages << chat_message

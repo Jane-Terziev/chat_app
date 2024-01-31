@@ -4,7 +4,10 @@ module Chats
       self.table_name = "messages"
 
       has_one_attached :attachment, dependent: :delete
+
       belongs_to :chat_participant
+
+      has_many :chat_message_links
       has_many :unacknowledged_messages, dependent: :delete_all
 
       MESSAGE_TYPES = Types::String.enum('message', 'image', 'file')
