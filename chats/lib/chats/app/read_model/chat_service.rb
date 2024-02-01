@@ -78,15 +78,18 @@ module Chats
 
         def get_images_from_chat(query)
           pagy_metadata, paginated_data = pagy_countless(
-            message_list_view_repository.where(chat_id: query.chat_id, message_type: 'image').order('created_at DESC'),
+            ActiveStorage::Attachment.joins(
+              "INNER JOIN messages ON CAST(messages.id AS uuid) = active_storage_attachments.record_id AND
+               active_storage_attachments.record_type = 'Chats::Domain::Message'
+              "
+            ).where("messages.chat_id = ?", query.chat_id).joins(:blob).where(
+              "active_storage_blobs.content_type LIKE ?", 'image%'
+            ).order('messages.created_at DESC'),
             items: query.page_size,
             page: query.page
           )
 
-          images_dto = ActiveStorage::Attachment.includes(:blob).where(
-            record_type: 'Chats::Domain::Message',
-            record_id: paginated_data.map(&:id)
-          ).map do |attachment_file|
+          images_dto = paginated_data.map do |attachment_file|
             ::Chats::Domain::FileDto.new(
               message_id: attachment_file.record_id,
               url: attachment_file.url,
@@ -103,20 +106,25 @@ module Chats
 
         def get_files_from_chat(query)
           pagy_metadata, paginated_data = pagy_countless(
-            message_list_view_repository.where(chat_id: query.chat_id, message_type: 'file').order('created_at DESC'),
+            ActiveStorage::Attachment.joins(
+              "INNER JOIN messages ON CAST(messages.id AS uuid) = active_storage_attachments.record_id AND
+               active_storage_attachments.record_type = 'Chats::Domain::Message'
+              "
+            ).where(
+              "messages.chat_id = ?", query.chat_id
+            ).joins(:blob).where(
+              blob: { content_type: 'application/pdf' }
+            ).order('messages.created_at DESC'),
             items: query.page_size,
             page: query.page
           )
 
-          files_dto = ActiveStorage::Attachment.includes(:blob).where(
-            record_type: 'Chats::Domain::Message',
-            record_id: paginated_data.map(&:id)
-          ).map do |attachment_file|
+          files_dto = paginated_data.map do |attachment|
             ::Chats::Domain::FileDto.new(
-              message_id: attachment_file.record_id,
-              url: attachment_file.url,
-              content_type: attachment_file.content_type,
-              filename: attachment_file.filename.to_s
+              message_id: attachment.record_id,
+              url: attachment.url,
+              content_type: attachment.content_type,
+              filename: attachment.filename.to_s
             )
           end
 

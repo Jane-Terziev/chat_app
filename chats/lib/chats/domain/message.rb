@@ -10,11 +10,11 @@ module Chats
       has_many :chat_message_links, dependent: :delete_all
       has_many :unacknowledged_messages, dependent: :delete_all
 
-      MESSAGE_TYPES = Types::String.enum('message', 'image', 'file')
-
       def attachment_file
         return nil unless attachment.attached?
-        ActiveStorage::Current.url_options = { host: 'localhost:3000' }
+        if ENV.fetch('IMAGE_STORAGE', 'local') == 'local'
+          ActiveStorage::Current.url_options = { host: 'localhost:3000' }
+        end
         FileDto.new(
           message_id: self.id,
           url: attachment.url,

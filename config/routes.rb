@@ -8,4 +8,6 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   root "chats/ui/chats#index"
+  post 'rails/active_storage/direct_uploads', to: 'active_storage/direct_uploads#create'
+  delete 'rails/active_storage/direct_uploads', to: 'active_storage/direct_uploads#destroy'
 end

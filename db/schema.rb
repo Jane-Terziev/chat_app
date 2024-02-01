@@ -32,6 +32,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_31_155021) do
     t.string "service_name", null: false
     t.bigint "byte_size", null: false
     t.string "checksum"
+    t.string "user_id"
     t.datetime "created_at", null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
@@ -124,8 +125,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_31_155021) do
       cp.status,
       u.first_name,
       u.last_name
-     FROM (chat_participants cp
-       JOIN users u ON (((cp.user_id)::text = (u.id)::text)));
+     FROM (users u
+       LEFT JOIN chat_participants cp ON (((cp.user_id)::text = (u.id)::text)));
   SQL
   create_view "message_list_views", sql_definition: <<-SQL
       SELECT m.id,

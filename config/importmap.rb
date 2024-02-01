@@ -10,4 +10,5 @@ pin "picmo" # @5.8.5
 pin "picmo/popup-picker", to: 'https://unpkg.com/@picmo/popup-picker@latest/dist/index.js?module', preload: true
 pin "slim-select" # @2.8.1
 pin "luxon" # @3.4.4
+pin "@rails/activestorage", to: "@rails--activestorage.js" # @7.1.3
 pin_all_from "app/javascript/controllers", under: "controllers"
