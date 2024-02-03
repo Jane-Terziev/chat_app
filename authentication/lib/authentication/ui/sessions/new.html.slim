@@ -1,0 +1,6 @@
+main.responsive
+  article.absolute.middle.center.center-align style="padding: 5rem; min-width: 45vw"
+    h4.max.center-align style="margin-bottom: 1.5rem" Log In
+    = render "form", form: form
+    div.row.center-align
+      = link_to "Sign Up", new_user_registration_path, class: 'link'
