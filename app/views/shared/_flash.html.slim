@@ -1,0 +1,5 @@
+- key = flash&.keys&.first || ""
+- value = flash[key] || []
+- value = [value] unless value.is_a?(Array)
+
+#flash data-controller="flash" data-flash-type-value=key data-flash-message-value=value
