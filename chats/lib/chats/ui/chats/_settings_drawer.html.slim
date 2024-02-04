@@ -1,0 +1,61 @@
+div#chatSettings
+  = render partial: 'chats/ui/chat_images/images_drawer'
+  = render partial: 'chats/ui/chat_links/links_drawer'
+  = render partial: 'chats/ui/participants/participants_dialog', locals: { chat_id: chat_id }
+  dialog#chatSettingsDrawer.right style="max-width: 20%"
+    header
+      nav style="gap: 0.25rem"
+        button.transparent.circle.large onclick="document.getElementById('chatSettingsDrawer').close()"
+          i close
+        h6.max.no-margin.cut-text Chat Settings
+    div.large-divider
+    details.small-margin
+      summary.none
+        article.round.no-elevate
+          nav
+            div.max Chat Members
+      = turbo_frame_tag 'participants_list', loading: :lazy, src: chat_participants_path(chat_id: chat_id), format: :turbo_stream
+      div.row.wave.round.medium-padding onclick="document.getElementById('chatSettingsDrawer').close(); document.getElementById('addChatParticipantDialog').show()"
+        i person_add
+        | Add People
+    details.small-margin
+      summary.none
+        article.round.no-elevate
+          nav
+            div.max Media
+            i chevron_right
+      = link_to chat_images_path(chat_id: chat_id), class: 'row wave round small-padding',
+              onclick: "document.getElementById('chatSettingsDrawer').close(); document.getElementById('chatImagesDrawer').show();",
+              "data-turbo-frame": "chat_images"
+        i.small-padding image
+        | Images
+      = link_to chat_files_path(chat_id: chat_id),
+              class: 'row wave round small-padding',
+              onclick: "document.getElementById('chatSettingsDrawer').close(); document.getElementById('chatFilesDrawer').show();",
+              "data-turbo-frame": "chat_files"
+        i.small-padding folder_open
+        | Files
+      = link_to chat_links_path(chat_id: chat_id),
+              class: 'row wave round small-padding',
+              onclick: "document.getElementById('chatSettingsDrawer').close(); document.getElementById('chatLinksDrawer').show();",
+              "data-turbo-frame": "chat_links"
+        i.small-padding link
+        | Links
+    details.small-margin
+      summary.none
+        article.round.no-elevate
+          nav
+            div.max Settings
+            i chevron_right
+
+      = link_to chat_path(id: chat_id),
+                        data: { "turbo-method": :delete, "turbo-frame": '_top' },
+                        class: "row wave round small-padding no-margin"
+        i.small-margin delete
+        | Delete Chat
+
+      = link_to chat_leave_chat_path(chat_id: chat_id),
+              data: { "turbo-method": :delete },
+              class: 'row wave round small-padding no-margin'
+        i.small-margin logout
+        | Leave Chat

@@ -1,0 +1,21 @@
+= turbo_frame_tag 'new_chat' do
+  = form_tag(chats_path(page: params[:page], q: params[:q].as_json), id: 'form', "data-controller": 'form') do
+    div.field.label.round.border
+      = text_field_tag 'chat[name]', form.params.dig(:name)
+      = label_tag 'chat[name]', 'Name'
+      span.error = show_error(form, :name)
+    div class=invalid?(form, :user_ids)
+      = select_tag 'chat[user_ids][]',
+              options_for_select(user_options.map {|it| [it.full_name, it.id]}, form.params.dig(:user_ids)),
+              multiple: true,
+              id: 'chat_user_ids',
+              "data-controller": 'slim-select',
+              "data-slim-select-selector-value": '#chat_user_ids',
+              "data-slim-select-placeholder-text-value": 'Select Users'
+      span.selectError style="font-weight: bolder; color: var(--error);inset-inline-start: 1.5rem; font-size: .75rem"
+        - if show_error(form, :user_ids)
+          | Select at least one user
+
+    div.row style="margin-top: 1rem;"
+    = button_tag 'Save'
+    a.button.border onclick="document.getElementById('newChatDialog').close()" Close

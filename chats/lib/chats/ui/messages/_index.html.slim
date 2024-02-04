@@ -1,0 +1,14 @@
+= turbo_frame_tag 'chat_messages' do
+  div#chatMessageContainer
+    div
+      = render partial: 'chats/ui/chats/settings_drawer', locals: { chat_id: paginated_result.data.id }
+      div.row(id=paginated_result.data.id)
+        div.max
+          h6.cut-text = paginated_result.data.name
+          p.max.tooltip.no-space.top = paginated_result.data.name
+        i style="cursor:pointer;" onclick="document.getElementById('chatSettingsDrawer').show()" more_horiz
+      div.large-divider
+    = turbo_stream_from [paginated_result.data.id, current_user.id]
+    = render partial: 'messages_list', locals: { paginated_result: paginated_result, user_id: current_user.id }
+    div
+      = render partial: 'form', locals: { chat_id: paginated_result.data.id, form: Chats::Ui::SendMessageValidator.new }

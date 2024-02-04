@@ -1,0 +1,15 @@
+= render partial: 'shared/image_preview_dialog'
+= render partial: 'new_dialog', locals: { user_options: @user_options }
+div.grid style="min-height: 85vh"
+  div.s12.m12.l4.border.round.large-padding
+    div.row style="margin-bottom: 2rem"
+      h6.max Chats
+      button.circle.responsive onclick="document.getElementById('newChatDialog').show()"
+        i add
+        span Add Chat
+    div style="margin-bottom: 1rem"
+    = render partial: 'chat_filter'
+    = turbo_stream_from ['chats_list', current_user.id]
+    = render partial: 'chats_list', locals: { chats: @paginated_result.data }
+  div.s12.m12.l8.border.round.large-padding
+    = turbo_frame_tag 'chat_messages'

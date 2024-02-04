@@ -1,0 +1,6 @@
+= turbo_stream.append 'chats' do
+  - @paginated_result.data.each do |chat|
+    = render partial: 'chat_list_item', locals: { chat: chat, move_to_top: false }
+= turbo_stream.replace 'pagination' do
+  - if @paginated_result.pagination.next.present?
+    = turbo_frame_tag 'pagination', loading: :lazy, src: chats_path(format: :turbo_stream, page: @paginated_result.pagination.next, q: params[:q].as_json)

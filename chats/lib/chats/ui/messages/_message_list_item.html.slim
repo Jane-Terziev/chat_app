@@ -1,0 +1,7 @@
+div(id=message.id class="grid" data-controller="message" data-message-scroll-value=should_scroll
+  data-message-acknowledge-url-value=chat_acknowledge_path(chat_id: message.chat_id)
+  data-message-acknowledge-value=acknowledge)
+  - if message.user_id == user_id
+    = render partial: 'chats/ui/messages/right_message', locals: { message: message }
+  - else
+    = render partial: 'chats/ui/messages/left_message', locals: { message: message }

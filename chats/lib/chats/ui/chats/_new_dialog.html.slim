@@ -1,0 +1,8 @@
+dialog#newChatDialog.modal.surface
+  header
+    nav style="gap: 0.25rem"
+      h6.max.no-margin New Chat
+      button.transparent.circle.large onclick="document.getElementById('newChatDialog').close()"
+        i close
+  div.large-divider
+  = render partial: 'form', locals: { form: Chats::Ui::CreateChatValidator.new, user_options: user_options }
