@@ -1,6 +1,0 @@
-<%= search_form_for Chats::Domain::ReadModel::ChatListView.ransack(params[:q]), url: chats_path, data: { "data-controller": "form" } do |f| %>
-  <div class="field label round border">
-    <%= f.search_field :name_cont, placeholder: ' ' %>
-    <%= f.label :name_cont, 'Search' %>
-  </div>
-<% end %>

@@ -1,0 +1,19 @@
+= turbo_frame_tag 'message_form' do
+  = form_tag(chat_messages_path(chat_id: chat_id), id: 'messageForm', "data-controller": 'form message-file-preview', :multipart => true) do
+    = file_field_tag 'message[attachments][]', style: 'display: none',
+            "data-action": 'change->message-file-preview#readURL',
+            multiple: true,
+            accept: '.png, .jpg, .jpeg, .pdf',
+            class: 'attachmentsFileInput',
+            direct_upload: true
+    div.field.label.textarea.round.border.suffix.small.no-margin
+      = text_area_tag 'message[message]', form.params.dig(:message),  "data-controller": "message-field", class: "messageInput"
+      = label_tag 'message[message]', 'Message'
+      span.error = show_error(form, :message)
+      a data-controller="emoji-picker" data-action="click->emoji-picker#togglePicker"
+        i add_reaction
+      a style="inset: 50% 3rem auto auto;" onclick="document.getElementById('message_attachments_').click();"
+        i attach_file
+    div.row
+      div.max.attachmentsRow style="display: inline-flex;"
+    = button_tag 'Submit', id: "messageFormButton", style: 'display: none;'

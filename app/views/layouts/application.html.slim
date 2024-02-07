@@ -1,0 +1,30 @@
+doctype html
+
+html
+  head
+    title Chat App
+    meta name="turbo-cache-control" content="no-cache"
+    meta name="viewport" content="width=device-width,initial-scale=1"
+    = csrf_meta_tags
+    = csp_meta_tag
+    = stylesheet_link_tag "https://cdn.jsdelivr.net/npm/beercss@3.4.13/dist/cdn/beer.min.css", "data-turbo-track": "reload"
+    = stylesheet_link_tag "https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    = stylesheet_link_tag "https://unpkg.com/slim-select@latest/dist/slimselect.css"
+    = stylesheet_link_tag "application", "data-turbo-track": "reload"
+    = javascript_include_tag "https://cdn.jsdelivr.net/npm/chart.js"
+    = javascript_importmap_tags
+
+  body data-controller="theme"
+    = render partial: 'shared/flash'
+    - if current_user
+      = tag.div id: 'time-zone', data: { time_zone: current_user.time_zone }
+      = turbo_stream_from current_user.id
+      = render partial: 'shared/sidebar', locals: { id: 'sidebar', dialog: false }
+      = render partial: 'shared/navigation_drawer'
+      = render partial: 'shared/bottom_navigation'
+      main.responsive.max
+        = render partial: 'shared/navbar'
+        div.medium-margin
+          = yield
+    - else
+      = yield
