@@ -6,13 +6,13 @@ div.s12.m12.l12.left-align
         div.max
           p
             span style="font-size: 3rem"
-              = Rinku.auto_link(message.message, :all, 'target="_blank"').html_safe
+              = message.message
             span.tooltip.no-space.bottom data-controller="chat-date-formatter" data-chat-date-formatter-timestamp-value=message.created_at.as_json
       - else
         div.max
           div.border.round.medium-padding style="display: inline-block"
             p
-              = Rinku.auto_link(message.message, :all, 'target="_blank"').html_safe
+              = message.message
             p.tooltip.no-space.bottom data-controller="chat-date-formatter" data-chat-date-formatter-timestamp-value=message.created_at.as_json
     - else
       - if message.attachment_file.present?
