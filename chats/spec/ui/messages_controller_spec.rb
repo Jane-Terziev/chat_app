@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Chats::Ui::MessagesController, type: :controller do
-  let(:current_user) do
-    User.create!(
+  let!(:current_user) do
+    Authentication::Domain::User.create!(
       id: SecureRandom.uuid,
       email: "test@example.com",
       password: 'test123',
@@ -11,12 +11,23 @@ RSpec.describe Chats::Ui::MessagesController, type: :controller do
     )
   end
 
+  let!(:other_user) do
+    Authentication::Domain::User.create!(
+      id: SecureRandom.uuid,
+      email: "test1@example.com",
+      password: 'test123',
+      first_name: "First Name",
+      last_name: "Last Name"
+    )
+  end
+
   let!(:chat) do
-    Chats::Domain::Chat.create!(
+    Chats::Domain::Chat.create_new(
       id: SecureRandom.uuid,
       name: 'string',
-      chat_participants: [Chats::Domain::ChatParticipant.new(id: SecureRandom.uuid, user_id: current_user.id)]
-    )
+      user_ids: [current_user.id, other_user.id],
+      user_id: current_user.id
+    ).tap(&:save!)
   end
 
   describe 'GET #index' do
@@ -105,13 +116,14 @@ RSpec.describe Chats::Ui::MessagesController, type: :controller do
   end
 
   describe "DELETE #destroy" do
-    before do
-      chat.send_message(user_id: current_user.id, message: "Test")
+    let!(:message) do
+      message = chat.send_message(user_id: current_user.id, message: "Test")
       chat.save!
+      message
     end
 
     context "when the user is not authenticated" do
-      subject { delete :destroy, params: { id: chat.chat_participants.first.messages.first.id, chat_id: chat.id } }
+      subject { delete :destroy, params: { id: message.id, chat_id: chat.id } }
 
       it 'should redirect to sessions page' do
         subject
@@ -128,7 +140,7 @@ RSpec.describe Chats::Ui::MessagesController, type: :controller do
       end
 
       context 'when the chat is not found' do
-        subject { delete :destroy, params: { id: chat.chat_participants.first.messages.first.id, chat_id: SecureRandom.uuid } }
+        subject { delete :destroy, params: { id: message.id, chat_id: SecureRandom.uuid } }
         render_views
 
         it 'should raise a ActiveRecord::RecordNotFound error' do
@@ -146,7 +158,7 @@ RSpec.describe Chats::Ui::MessagesController, type: :controller do
       end
 
       context "when chat and message exist" do
-        subject { delete :destroy, params: { id: chat.chat_participants.first.messages.first.id, chat_id: chat.id } }
+        subject { delete :destroy, params: { id: message.id, chat_id: chat.id } }
         render_views
 
         it 'should delete the message' do

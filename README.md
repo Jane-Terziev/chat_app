@@ -23,8 +23,8 @@ The recommended way to get started is with docker.
     docker-compose run --rm app rails c
 
 ```ruby
-User.create!(id: SecureRandom.uuid, email: "test1@example.com", password: "test123", first_name: "Name1", last_name: "LastName1")
-User.create!(id: SecureRandom.uuid, email: "test2@example.com", password: "test123", first_name: "Name2", last_name: "LastName2")
+Authentication::Domain::User.create!(id: SecureRandom.uuid, email: "test1@example.com", password: "test123", first_name: "Name1", last_name: "LastName1")
+Authentication::Domain::User.create!(id: SecureRandom.uuid, email: "test2@example.com", password: "test123", first_name: "Name2", last_name: "LastName2")
 ```
 
     docker-compose up

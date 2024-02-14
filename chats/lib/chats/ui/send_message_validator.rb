@@ -16,7 +16,8 @@ module Chats
         ::DryStructGenerator::StructGenerator.new.call(
           self,
           {
-            chat_id: { required: true, type: 'string', null: false }
+            chat_id: { required: true, type: 'string', null: false },
+            attachments: { required: true, type: 'array', default: [] }
           }
         )
       end

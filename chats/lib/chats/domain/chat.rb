@@ -31,68 +31,62 @@ module Chats
         self
       end
 
-      def send_message(user_id:, message:, attachments: [])
+      def send_message(user_id:, message:)
         chat_participant = chat_participants.find { |it| it.user_id == user_id }
-        new_messages = []
+        chat_message = Message.new(
+          id: SecureRandom.uuid,
+          message: message,
+          unacknowledged_messages: chat_participants.filter { |it| it.user_id != user_id }.map do |participant|
+            UnacknowledgedMessage.new(user_id: participant.user_id, chat_id: self.id)
+          end,
+          chat_id: self.id
+        )
 
-        if message.present?
-          chat_message = Message.new(
-            id: SecureRandom.uuid,
-            message: message,
-            unacknowledged_messages: chat_participants.filter { |it| it.user_id != user_id }.map do |participant|
-              UnacknowledgedMessage.new(user_id: participant.user_id, chat_id: self.id)
-            end,
-            chat_id: self.id
-          )
-
-          links = message.scan(/https?:\/\/\S+/)
-          links.each do |link|
-            chat_message.chat_message_links << ChatMessageLink.new(id: SecureRandom.uuid, link: link)
-          end
-
-          chat_participant.messages << chat_message
-
-          new_messages << chat_message
-
-          apply_event(
-            MessageSentEvent.new(
-              data: {
-                chat_id: self.id,
-                message_id: chat_message.id,
-                chat_participant_user_ids: chat_participants.map(&:user_id)
-              }
-            )
-          )
+        links = message.scan(/https?:\/\/\S+/)
+        links.each do |link|
+          chat_message.chat_message_links << ChatMessageLink.new(id: SecureRandom.uuid, link: link)
         end
 
-        if attachments.present?
-          attachments.each do |attachment|
-            chat_message = Message.new(
-              id: SecureRandom.uuid,
-              unacknowledged_messages: chat_participants.filter { |it| it.user_id != user_id }.map do |participant|
-                UnacknowledgedMessage.new(user_id: participant.user_id, chat_id: self.id)
-              end,
-              attachment: attachment,
-              chat_id: self.id
-            )
+        chat_participant.messages << chat_message
 
-            chat_participant.messages << chat_message
+        apply_event(
+          MessageSentEvent.new(
+            data: {
+              chat_id: self.id,
+              message_id: chat_message.id,
+              chat_participant_user_ids: chat_participants.map(&:user_id)
+            }
+          )
+        )
 
-            new_messages << chat_message
+        chat_message
+      end
 
-            apply_event(
-              MessageSentEvent.new(
-                data: {
-                  chat_id: self.id,
-                  message_id: chat_message.id,
-                  chat_participant_user_ids: chat_participants.map(&:user_id)
-                }
-              )
-            )
-          end
-        end
+      def send_attachment(user_id:, attachment:)
+        chat_participant = chat_participants.find { |it| it.user_id == user_id }
 
-        new_messages
+        chat_message = Message.new(
+          id: SecureRandom.uuid,
+          unacknowledged_messages: chat_participants.filter { |it| it.user_id != user_id }.map do |participant|
+            UnacknowledgedMessage.new(user_id: participant.user_id, chat_id: self.id)
+          end,
+          attachment: attachment,
+          chat_id: self.id
+        )
+
+        chat_participant.messages << chat_message
+
+        apply_event(
+          MessageSentEvent.new(
+            data: {
+              chat_id: self.id,
+              message_id: chat_message.id,
+              chat_participant_user_ids: chat_participants.map(&:user_id)
+            }
+          )
+        )
+
+        chat_message
       end
 
       def apply_message_removed_event(message_id:)

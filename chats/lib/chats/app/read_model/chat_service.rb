@@ -8,7 +8,7 @@ module Chats
                   message_list_view_repository: 'chats.message_list_view_repository',
                   chat_participant_view_repository: 'chats.chat_participant_view_repository',
                   user_repository: 'chats.user_repository',
-                  chat_message_link_repository: 'chats.chat_message_link_repository',
+                  chat_message_link_repository: 'chats.chat_message_link_repository'
                 ]
 
         def get_all_chats(query)
@@ -36,7 +36,16 @@ module Chats
           )
         end
 
+        def get_messages_dto(message_ids)
+          map_into(message_list_view_repository.where(id: message_ids), ReadModel::MessageDto)
+        end
+
         def get_chat(query)
+          chat = chat_list_view_repository.find_by!(
+            id: query.chat_id,
+            user_id: current_user_repository.authenticated_identity.id
+          )
+
           pagy_metadata, paginated_data = pagy_countless(
             message_list_view_repository.where(chat_id: query.chat_id).order('created_at DESC'),
             items: query.page_size,
@@ -62,10 +71,7 @@ module Chats
           end
 
           chat_dto = map_into(
-            chat_list_view_repository.find_by!(
-              id: query.chat_id,
-              user_id: current_user_repository.authenticated_identity.id
-            ),
+            chat,
             GetChatDetailsDto,
             { messages: message_dtos.reverse }
           )

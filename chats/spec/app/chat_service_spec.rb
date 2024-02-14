@@ -4,17 +4,17 @@ RSpec.describe Chats::App::ChatService, type: :unit do
   subject(:chat_service) do
     described_class.new(
       chat_repository: chat_repository,
-      current_user_repository: current_user_repository,
       message_repository: message_repository,
-      chat_list_view_repository: chat_list_view_repository
+      current_user_repository: current_user_repository,
+      unacknowledged_message_repository: unacknowledged_message_repository
     )
   end
 
   let(:chat_repository) { spy(Chats::Domain::Chat) }
   let(:message_repository) { spy(Chats::Domain::Message) }
-  let(:chat_list_view_repository) { spy(Chats::Domain::ReadModel::ChatListView) }
   let(:current_user_repository) { spy(CurrentUserRepository) }
-  let(:current_user) { instance_double(User) }
+  let(:unacknowledged_message_repository) { spy(Chats::Domain::UnacknowledgedMessage) }
+  let(:current_user) { instance_double(Authentication::Domain::User) }
   let(:current_user_id) { SecureRandom.uuid }
   let(:chat) { instance_double(Chats::Domain::Chat, id: SecureRandom.uuid, domain_events: [], chat_participants: []) }
 
@@ -89,7 +89,7 @@ RSpec.describe Chats::App::ChatService, type: :unit do
       Chats::Ui::SendMessageValidator.command.new(
         chat_id: SecureRandom.uuid,
         message: 'message',
-        attachments: ['attachment']
+        attachments: []
       )
     end
 
@@ -106,25 +106,80 @@ RSpec.describe Chats::App::ChatService, type: :unit do
     end
 
     context "when the chat is found" do
-      before do
-        allow(chat_repository).to receive(:find) { chat }
-        allow(chat_list_view_repository).to receive(:find_by!) { [chat] }
-        allow(chat).to receive(:send_message)
-        allow(chat_repository).to receive(:save!) { chat }
-        allow(chat_service).to receive(:publish_all)
-        allow(chat_service).to receive(:map_into)
+      context "when sending a message only" do
+        let(:message) { spy(Chats::Domain::Message) }
+
+        before do
+          allow(chat_repository).to receive(:find) { chat }
+          allow(chat).to receive(:send_message) { message }
+          allow(chat_repository).to receive(:save!) { chat }
+          allow(chat_service).to receive(:publish_all)
+        end
+
+        it 'should add the message to the chat' do
+          expect { chat_service.send_message(command) }.to_not raise_error
+          expect(chat_repository).to have_received(:find).with(command.chat_id)
+          expect(chat).to have_received(:send_message).with(message: command.message, user_id: current_user_id)
+          expect(chat_repository).to have_received(:save!).with(chat)
+          expect(chat_service).to have_received(:publish_all).with(chat)
+        end
       end
 
-      it 'should add the message to the chat' do
-        expect { chat_service.send_message(command) }.to_not raise_error
-        expect(chat_repository).to have_received(:find).with(command.chat_id)
-        expect(chat).to have_received(:send_message).with(
-          message: command.message,
-          attachments: command.attachments,
-          user_id: current_user_id
-        )
-        expect(chat_repository).to have_received(:save!).with(chat)
-        expect(chat_service).to have_received(:publish_all).with(chat)
+      context "when sending an attachment only" do
+        let(:command) do
+          Chats::Ui::SendMessageValidator.command.new(
+            chat_id: SecureRandom.uuid,
+            attachments: ['aws-s3.com']
+          )
+        end
+        let(:message) { spy(Chats::Domain::Message) }
+
+        before do
+          allow(chat_repository).to receive(:find) { chat }
+          allow(chat).to receive(:send_attachment) { message }
+          allow(chat_repository).to receive(:save!) { chat }
+          allow(chat_service).to receive(:publish_all)
+        end
+
+        it 'should add the attachment to the chat' do
+          expect { chat_service.send_message(command) }.to_not raise_error
+          expect(chat_repository).to have_received(:find).with(command.chat_id)
+          command.attachments.each do |attachment|
+            expect(chat).to have_received(:send_attachment).with(attachment: attachment, user_id: current_user_id)
+          end
+          expect(chat_repository).to have_received(:save!).with(chat)
+          expect(chat_service).to have_received(:publish_all).with(chat)
+        end
+      end
+
+      context "when sending an attachment and a message" do
+        let(:command) do
+          Chats::Ui::SendMessageValidator.command.new(
+            chat_id: SecureRandom.uuid,
+            message: 'message',
+            attachments: ['aws-s3.com']
+          )
+        end
+        let(:message) { spy(Chats::Domain::Message) }
+
+        before do
+          allow(chat_repository).to receive(:find) { chat }
+          allow(chat).to receive(:send_message) { message }
+          allow(chat).to receive(:send_attachment) { message }
+          allow(chat_repository).to receive(:save!) { chat }
+          allow(chat_service).to receive(:publish_all)
+        end
+
+        it 'should add the attachment and message to the chat' do
+          expect { chat_service.send_message(command) }.to_not raise_error
+          expect(chat_repository).to have_received(:find).with(command.chat_id)
+          expect(chat).to have_received(:send_message).with(message: command.message, user_id: current_user_id)
+          command.attachments.each do |attachment|
+            expect(chat).to have_received(:send_attachment).with(attachment: attachment, user_id: current_user_id)
+          end
+          expect(chat_repository).to have_received(:save!).with(chat)
+          expect(chat_service).to have_received(:publish_all).with(chat)
+        end
       end
     end
   end
@@ -132,7 +187,7 @@ RSpec.describe Chats::App::ChatService, type: :unit do
   describe "#.acknowledge_messages(chat_id)" do
     context "when the chat is not found" do
       before do
-        allow(chat_repository).to receive(:find) { raise ActiveRecord::RecordNotFound }
+        allow(chat_repository).to receive(:exists?) { false }
       end
 
       it 'should raise ActiveRecord::RecordNotFound error' do
@@ -142,19 +197,16 @@ RSpec.describe Chats::App::ChatService, type: :unit do
 
     context "when the chat is found" do
       before do
-        allow(chat_repository).to receive(:find) { chat }
-        allow(chat).to receive_message_chain(:unacknowledged_messages, :delete_all)
-        allow(chat_repository).to receive(:save!) { chat }
+        allow(chat_repository).to receive(:exists?) { true }
+        allow(unacknowledged_message_repository).to receive_message_chain(:where, :delete_all)
         allow(chat_service).to receive(:publish_all)
       end
 
       it 'should acknowledge the chat messages' do
         expect { chat_service.acknowledge_messages(chat.id) }.to_not raise_error
-        expect(chat_repository).to have_received(:find).with(chat.id)
-        expect(chat).to have_received(:unacknowledged_messages)
-        expect(chat.unacknowledged_messages).to have_received(:delete_all)
-        expect(chat_repository).to have_received(:save!).with(chat)
-        expect(chat_service).to have_received(:publish_all).with(chat)
+        expect(chat_repository).to have_received(:exists?).with(id: chat.id)
+        expect(unacknowledged_message_repository).to have_received(:where).with(chat_id: chat.id, user_id: current_user.id)
+        expect(unacknowledged_message_repository.where).to have_received(:delete_all)
       end
     end
   end
@@ -173,15 +225,12 @@ RSpec.describe Chats::App::ChatService, type: :unit do
     end
 
     context "when the chat is found" do
-      let(:chat_list_view) { instance_double(Chats::Domain::ReadModel::ChatListView) }
       before do
         allow(chat_repository).to receive(:find) { chat }
         allow(message_repository).to receive_message_chain(:joins, :where, :find, :destroy!)
         allow(chat).to receive(:apply_message_removed_event)
         allow(chat_repository).to receive(:save!) { chat }
         allow(chat_service).to receive(:publish_all)
-        allow(chat_list_view_repository).to receive(:find_by!) { chat_list_view }
-        allow(chat_service).to receive(:map_into)
       end
 
       it 'should remove the message' do
@@ -190,7 +239,6 @@ RSpec.describe Chats::App::ChatService, type: :unit do
         expect(message_repository.joins.where).to have_received(:find).with(message_id)
         expect(chat_repository).to have_received(:save!).with(chat)
         expect(chat_service).to have_received(:publish_all).with(chat)
-        expect(chat_service).to have_received(:map_into).with(chat_list_view, Chats::App::GetChatsListDto)
       end
     end
   end
@@ -214,7 +262,6 @@ RSpec.describe Chats::App::ChatService, type: :unit do
         allow(chat).to receive(:add_chat_participants)
         allow(chat_repository).to receive(:save!) { chat }
         allow(chat_service).to receive(:publish_all)
-        allow(chat_service).to receive(:map_into)
       end
 
       it 'should add the participants' do
@@ -223,7 +270,6 @@ RSpec.describe Chats::App::ChatService, type: :unit do
         expect(chat).to have_received(:add_chat_participants).with(user_ids: command.user_ids)
         expect(chat_repository).to have_received(:save!).with(chat)
         expect(chat_service).to have_received(:publish_all).with(chat)
-        expect(chat_service).to have_received(:map_into).with(chat.chat_participants, Chats::App::ChatParticipantDto)
       end
     end
   end
@@ -246,7 +292,6 @@ RSpec.describe Chats::App::ChatService, type: :unit do
         allow(chat).to receive(:remove_chat_participant)
         allow(chat_repository).to receive(:save!) { chat }
         allow(chat_service).to receive(:publish_all)
-        allow(chat_service).to receive(:map_into)
       end
 
       it 'should add the participants' do
@@ -255,68 +300,6 @@ RSpec.describe Chats::App::ChatService, type: :unit do
         expect(chat).to have_received(:remove_chat_participant).with(user_id: user_id)
         expect(chat_repository).to have_received(:save!).with(chat)
         expect(chat_service).to have_received(:publish_all).with(chat)
-        expect(chat_service).to have_received(:map_into).with(chat.chat_participants, Chats::App::ChatParticipantDto)
-      end
-    end
-  end
-
-  describe "#.get_all_chats(query)" do
-    let(:query) { Chats::Ui::ListQuery.new }
-    let(:chat_list) { [instance_double(Chats::Domain::ReadModel::ChatListView)] }
-
-    context "when getting a list of chats" do
-      before do
-        allow(chat_list_view_repository).to receive_message_chain(:where, :order, :ransack, :result) { chat_list }
-        allow(chat_service).to receive(:map_into)
-        allow(chat_service).to receive(:pagy_countless) { [Pagy.new(count: 1000, page: 10, size: 5), chat_list]  }
-      end
-
-      it 'should return a mapped dto' do
-        chat_service.get_all_chats(query)
-        expect(chat_list_view_repository).to have_received(:where).with(user_id: current_user_id)
-        expect(chat_list_view_repository.where).to have_received(:order).with('updated_at DESC')
-        expect(chat_list_view_repository.where.order).to have_received(:ransack).with(query.q)
-        expect(chat_list_view_repository.where.order.ransack).to have_received(:result)
-      end
-    end
-  end
-
-  describe "#.get_chat(query)" do
-    let(:query) { Chats::Ui::MessageListQuery.new(chat_id: chat.id) }
-
-    context "when the chat with the id is not found" do
-      before do
-        allow(chat_repository).to receive(:find) { raise ActiveRecord::RecordNotFound }
-      end
-
-      it 'should raise a ActiveRecord::RecordNotFound error' do
-        expect { chat_service.get_chat(query) }.to raise_error { ActiveRecord::RecordNotFound }
-        expect(chat_repository).to have_received(:find).with(chat.id)
-      end
-    end
-
-    context "when the chat is found" do
-      let(:messages)  { [spy(Chats::Domain::Message)] }
-
-      before do
-        allow(chat_repository).to receive(:find) { chat }
-        allow(chat).to receive_message_chain(:unacknowledged_messages, :where, :delete_all)
-        allow(chat_repository).to receive(:save!) { chat }
-        allow(chat_service).to receive(:publish_all)
-        allow(message_repository).to receive_message_chain(:joins, :where, :includes, :order) { messages }
-        allow(chat_service).to receive(:map_into).with(messages[0], Chats::App::MessageDto, { attachment_file: nil }) { messages[0] }
-        allow(chat_service).to receive(:map_into).with(chat, Chats::App::GetChatDetailsDto, { messages: messages.reverse })
-        allow(chat_service).to receive(:pagy_countless) { [Pagy.new(count: 1000, page: 10, size: 5), messages]  }
-      end
-
-      it 'should return a chat details dto' do
-        chat_service.get_chat(query)
-        expect(chat).to have_received(:unacknowledged_messages)
-        expect(chat.unacknowledged_messages).to have_received(:where).with(user_id: current_user_id)
-        expect(chat.unacknowledged_messages.where).to have_received(:delete_all)
-        expect(chat_repository).to have_received(:save!).with(chat)
-        expect(chat_service).to have_received(:publish_all).with(chat)
-        expect(chat_service).to have_received(:map_into).with(chat, Chats::App::GetChatDetailsDto, { messages: messages.reverse })
       end
     end
   end

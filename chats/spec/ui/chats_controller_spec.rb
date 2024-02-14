@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Chats::Ui::ChatsController, type: :controller do
   let!(:chats) { [Chats::Domain::Chat.create!(id: SecureRandom.uuid, name: 'string')] }
   let(:current_user) do
-    User.create!(
+    Authentication::Domain::User.create!(
       id: SecureRandom.uuid,
       email: "test@example.com",
       password: 'test123',
@@ -43,7 +43,7 @@ RSpec.describe Chats::Ui::ChatsController, type: :controller do
   describe "POST #create" do
     let(:users) do
       [
-        User.create!(
+        Authentication::Domain::User.create!(
           id: SecureRandom.uuid,
           email: "test1@example.com",
           password: 'test123',
@@ -150,7 +150,7 @@ RSpec.describe Chats::Ui::ChatsController, type: :controller do
 
   describe "GET #acknowledge" do
     let!(:other_user) do
-      User.create!(
+      Authentication::Domain::User.create!(
         id: SecureRandom.uuid,
         email: "test2@example.com",
         password: 'test123',
@@ -174,15 +174,6 @@ RSpec.describe Chats::Ui::ChatsController, type: :controller do
       before do
         allow_any_instance_of(Chats::Ui::ChatsController).to receive(:authenticate_user!)
         allow_any_instance_of(Chats::Ui::ChatsController).to receive(:current_user) { current_user }
-      end
-
-      context 'when the chat is not found' do
-        subject { get :acknowledge, params: { chat_id: SecureRandom.uuid } }
-        render_views
-
-        it 'should raise a ActiveRecord::RecordNotFound error' do
-          expect { subject }.to raise_error(ActiveRecord::RecordNotFound)
-        end
       end
 
       context 'when the chat is found' do

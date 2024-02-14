@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Chats::Ui::ParticipantsController, type: :controller do
   let(:current_user) do
-    User.create!(
+    Authentication::Domain::User.create!(
       id: SecureRandom.uuid,
       email: "test@example.com",
       password: 'test123',
@@ -12,7 +12,7 @@ RSpec.describe Chats::Ui::ParticipantsController, type: :controller do
   end
 
   let(:other_user) do
-    User.create!(
+    Authentication::Domain::User.create!(
       id: SecureRandom.uuid,
       email: "test2@example.com",
       password: 'test123',

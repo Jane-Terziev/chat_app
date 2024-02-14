@@ -32,11 +32,12 @@ module Chats
       end
 
       def create
-        new_messages_dto = chat_service.send_message(
+        new_message_ids = chat_service.send_message(
           validator.validate(message_params, SendMessageValidator.new, { chat_id: params[:chat_id] })
         )
 
         chat_dto = chat_read_service.get_chat_list_dto(params[:chat_id])
+        new_messages_dto = chat_read_service.get_messages_dto(new_message_ids)
 
         append_message_streams = new_messages_dto.map do |new_message_dto|
           turbo_stream.append(

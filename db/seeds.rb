@@ -1,6 +1,6 @@
 users = [
-  User.create!(id: SecureRandom.uuid, email: "test1@example.com", password: "test123", first_name: "Name1", last_name: "LastName1"),
-  User.create!(id: SecureRandom.uuid, email: "test2@example.com", password: "test123", first_name: "Name2", last_name: "LastName2")
+  Authentication::Domain::User.create!(id: SecureRandom.uuid, email: "test1@example.com", password: "test123", first_name: "Name1", last_name: "LastName1"),
+  Authentication::Domain::User.create!(id: SecureRandom.uuid, email: "test2@example.com", password: "test123", first_name: "Name2", last_name: "LastName2")
 ]
 
 user_ids = users.map(&:id)

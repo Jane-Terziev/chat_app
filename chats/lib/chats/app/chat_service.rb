@@ -36,25 +36,30 @@ module Chats
       def send_message(command)
         chat, new_messages = ActiveRecord::Base.transaction do
           chat = chat_repository.find(command.chat_id)
-          new_messages = chat.send_message(
+          new_messages = []
+          new_messages << chat.send_message(
             user_id: current_user_repository.authenticated_identity.id,
-            message: command.message,
-            attachments: command.attachments
-          )
+            message: command.message
+          ) if command.message.present?
+
+          new_messages += command.attachments.map do |attachment|
+            chat.send_attachment(
+              user_id: current_user_repository.authenticated_identity.id,
+              attachment: attachment
+            )
+          end
+
           [chat_repository.save!(chat), new_messages]
         end
 
         publish_all(chat)
 
-        map_into(
-            new_messages,
-            ReadModel::MessageDto,
-            { user_id: current_user_repository.authenticated_identity.id, chat_id: command.chat_id }
-          )
+        new_messages.map(&:id)
       end
 
       def acknowledge_messages(chat_id)
         ActiveRecord::Base.transaction do
+          raise ActiveRecord::RecordNotFound unless chat_repository.exists?(id: chat_id)
           unacknowledged_message_repository.where(
             chat_id: chat_id,
             user_id: current_user_repository.authenticated_identity.id
@@ -79,7 +84,7 @@ module Chats
 
       def add_chat_participants(command)
         chat = ActiveRecord::Base.transaction do
-          chat = chat_repository.includes(chat_participants: :user).find(command.chat_id)
+          chat = chat_repository.find(command.chat_id)
           chat.add_chat_participants(user_ids: command.user_ids)
 
           chat_repository.save!(chat)
@@ -90,7 +95,7 @@ module Chats
 
       def remove_chat_participant(chat_id, user_id)
         chat = ActiveRecord::Base.transaction do
-          chat = chat_repository.includes(:chat_participants).find(chat_id)
+          chat = chat_repository.find(chat_id)
           chat.remove_chat_participant(user_id: user_id)
 
           chat_repository.save!(chat)
