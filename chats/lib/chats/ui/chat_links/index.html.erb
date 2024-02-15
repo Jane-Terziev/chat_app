@@ -1,9 +1,6 @@
 <%= turbo_frame_tag 'chat_links' do %>
   <div id="chatFilesContainer" class="grid">
-    <% @paginated_result.data.each do |link_dto| %>
-      <%= render 'link', link_dto: link_dto %>
-    <% end %>
-
+    <%= render partial: 'link', collection: @paginated_result.data, as: :link_dto %>
     <% if @paginated_result.pagination.next.present? %>
       <%= turbo_frame_tag 'link_pagination', loading: :lazy, src: chat_links_path(format: :turbo_stream, chat_id: params[:chat_id]) %>
     <% end %>

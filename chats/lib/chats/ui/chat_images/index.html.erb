@@ -1,10 +1,6 @@
 <%= turbo_frame_tag 'chat_images' do %>
   <div id="chatImagesContainer" class="grid" style="min-height: 85vh">
-    <% @paginated_result.data.each do |file_dto| %>
-      <%= render 'image', file_dto: file_dto %>
-    <% end %>
-
-
+    <%= render partial: 'image', collection: @paginated_result.data, as: :file_dto %>
     <% if @paginated_result.pagination.next.present? %>
       <%= turbo_frame_tag 'image_pagination', loading: :lazy, src: chat_images_path(format: :turbo_stream, chat_id: params[:chat_id]) %>
     <% end %>

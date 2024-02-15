@@ -1,7 +1,5 @@
 <%= turbo_stream.append 'chatFilesContainer' do %>
-  <% @paginated_result.data.each do |file_dto|  %>
-    <%= render 'file', file_dto: file_dto %>
-  <% end %>
+  <%= render partial: 'file', collection: @paginated_result.data, as: :file_dto %>
 <% end %>
 
 <%= turbo_stream.replace 'file_pagination' do %>

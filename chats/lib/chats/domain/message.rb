@@ -12,9 +12,7 @@ module Chats
 
       def attachment_file
         return nil unless attachment.attached?
-        if ENV.fetch('IMAGE_STORAGE', 'local') == 'local'
-          ActiveStorage::Current.url_options = { host: 'localhost:3000' }
-        end
+
         FileDto.new(
           message_id: self.id,
           url: attachment.url,

@@ -1,5 +1,3 @@
 <div id="chatParticipantList">
-  <% participants.filter{ |it| it.status != 'removed' }.each do |participant| %>
-    <%= render 'chats/ui/participants/participant_list_item', chat_id: chat_id, participant: participant, user_id: user_id %>
-  <% end %>
+  <%= render partial: 'chats/ui/participants/participant_list_item', collection: participants.filter{ |it| it.status != 'removed' }, as: :participant, locals: { chat_id: chat_id, user_id: user_id } %>
 </div>

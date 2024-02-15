@@ -8,8 +8,11 @@ div.grid style="min-height: 85vh"
         i add
         span Add Chat
     div style="margin-bottom: 1rem"
-    = render partial: 'chat_filter'
+    = render partial: 'chats/ui/chats/chat_filter'
     = turbo_stream_from ['chats_list', current_user.id]
-    = render partial: 'chats_list', locals: { chats: @paginated_result.data }
+    div style="height: 450px; overflow-y: scroll; padding-bottom: 1rem;"
+      div#chats
+        = render partial: 'chat_list_item', collection: @paginated_result.data, as: :chat, locals: { move_to_top: false }
+      = turbo_frame_tag 'pagination', loading: :lazy, src: chats_path(format: :turbo_stream, q: params[:q].as_json)
   div.s12.m12.l8.border.round.large-padding
     = turbo_frame_tag 'chat_messages'

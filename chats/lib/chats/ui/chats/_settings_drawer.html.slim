@@ -1,5 +1,6 @@
 div#chatSettings
   = render partial: 'chats/ui/chat_images/images_drawer'
+  = render partial: 'chats/ui/chat_files/files_drawer'
   = render partial: 'chats/ui/chat_links/links_drawer'
   = render partial: 'chats/ui/participants/participants_dialog', locals: { chat_id: chat_id }
   dialog#chatSettingsDrawer.right style="max-width: 20%"

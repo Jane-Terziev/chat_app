@@ -1,7 +1,5 @@
 <%= turbo_stream.prepend 'messageContainer' do %>
-  <% @paginated_result.data.messages.each do |message|  %>
-    <%= render 'message_list_item', message: message, user_id: current_user.id, should_scroll: false, acknowledge: false %>
-  <% end %>
+  <%= render partial: 'message_list_item', collection: @paginated_result.data.messages, as: :message, locals: { user_id: current_user.id, should_scroll: false, acknowledge: false} %>
 <% end %>
 
 <%= turbo_stream.replace 'message_pagination' do %>

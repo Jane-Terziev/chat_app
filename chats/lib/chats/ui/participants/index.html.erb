@@ -1,3 +1,5 @@
 <%= turbo_frame_tag 'participants_list' do %>
-  <%= render 'chats/ui/participants/participant_list', participants: participants, chat_id: params[:chat_id], user_id: current_user.id %>
+  <div id="chatParticipantList">
+    <%= render partial: 'chats/ui/participants/participant_list_item', collection: participants.filter{ |it| it.status != 'removed' }, as: :participant, locals: { user_id: current_user.id } %>
+  </div>
 <% end %>

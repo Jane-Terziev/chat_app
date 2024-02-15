@@ -9,6 +9,10 @@
         i style="cursor:pointer;" onclick="document.getElementById('chatSettingsDrawer').show()" more_horiz
       div.large-divider
     = turbo_stream_from [paginated_result.data.id, current_user.id]
-    = render partial: 'messages_list', locals: { paginated_result: paginated_result, user_id: current_user.id }
+    div style="overflow-y: scroll; height: 450px;" data-controller="chat"
+      - if paginated_result.pagination.next.present?
+        = turbo_frame_tag 'message_pagination', loading: :lazy, src: chat_messages_load_more_path(format: :turbo_stream, page: paginated_result.pagination.next)
+      div#messageContainer
+        = render partial: 'message_list_item', collection: paginated_result.data.messages, as: :message, locals: { user_id: current_user.id, should_scroll: false, acknowledge: false }
     div
       = render partial: 'form', locals: { chat_id: paginated_result.data.id, form: Chats::Ui::SendMessageValidator.new }

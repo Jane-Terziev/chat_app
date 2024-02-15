@@ -4,7 +4,7 @@
     <p style="font-weight: bold"><%= participant.first_name %> <%= participant.last_name %></p>
   </div>
   <% unless participant.user_id == user_id %>
-    <%= link_to chat_participant_path(id: participant.user_id, chat_id: chat_id),
+    <%= link_to chat_participant_path(id: participant.user_id, chat_id: participant.chat_id),
                 data: { "turbo-method": :delete }, style: "cursor:pointer;" do %>
       <i>delete</i>
     <% end %>

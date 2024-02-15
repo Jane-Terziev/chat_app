@@ -1,5 +1,0 @@
-div style="height: 450px; overflow-y: scroll; padding-bottom: 1rem;"
-  div#chats
-    - chats.each do |chat|
-      = render partial: 'chat_list_item', locals: { chat: chat, move_to_top: false }
-  = turbo_frame_tag 'pagination', loading: :lazy, src: chats_path(format: :turbo_stream, q: params[:q].as_json)
