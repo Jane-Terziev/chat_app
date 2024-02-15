@@ -8,7 +8,6 @@ Bundler.require(*Rails.groups)
 
 module ChatApp
   class Application < Rails::Application
-    config.eager_load_paths << Rails.root.join("lib/utils")
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.1
 
@@ -25,6 +24,7 @@ module ChatApp
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
     config.active_job.queue_adapter = :sidekiq
+    config.autoload_paths << "#{config.root}/lib/utils"
   end
 end
 

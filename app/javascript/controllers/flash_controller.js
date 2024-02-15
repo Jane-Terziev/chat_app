@@ -1,5 +1,4 @@
 import { Controller } from "@hotwired/stimulus"
-import { showToastMessage } from "../toast";
 
 export default class extends Controller {
     static values = { type: String, message: Array }

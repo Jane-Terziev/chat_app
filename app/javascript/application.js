@@ -2,9 +2,29 @@ import "@hotwired/turbo-rails";
 import "controllers";
 import 'beercss';
 import * as luxon from 'luxon';
-import { showToastMessage } from "./toast";
 import * as picmo from 'picmo';
 import * as picmo_popup from 'picmo/popup-picker';
+import Toastify from "toastify-js";
+
+export function showToastMessage(key, value) {
+    let className = '';
+    if(key === 'error' || key === 'alert') {
+        className = 'error';
+    } else {
+        className = 'success';
+    }
+    Toastify({
+        text: value,
+        position: "left",
+        duration: 3500,
+        close: true,
+        stopOnFocus: true,
+        backgroundColor: 'none',
+        className: className,
+        style: { width: "100%" },
+        offset: { x: '50%' }
+    }).showToast();
+}
 
 addEventListener("turbo:before-stream-render", (event) => {
     const originalRender = event.detail.render
